@@ -1,7 +1,5 @@
 package ru.ylab.service;
 
-import ru.ylab.exception.AccessDenialException;
-
 import java.util.HashMap;
 
 /**
@@ -28,12 +26,16 @@ public class AuthService {
      *
      * @param username the username
      * @param password the password
+     * @return username
      */
-    public void registerUser(String username, String password) {
-        if (authDetails.containsKey(username))
-            throw new AccessDenialException("Такой пользователь уже зарегистрирован");
+    public String registerUser(String username, String password) {
+        if (authDetails.containsKey(username)) {
+            System.out.println("Такой пользователь уже зарегистрирован");
+            return null;
+        }
         authDetails.put(username, password);
         System.out.println("Пользователь успешно зарегистрирован");
+        return username;
     }
 
     /**
@@ -41,14 +43,19 @@ public class AuthService {
      *
      * @param username the username
      * @param password the password
+     * @return username
      */
-    public void authUser(String username, String password) {
+    public String authUser(String username, String password) {
         if (!authDetails.containsKey(username)) {
-            throw new AccessDenialException("Пользователя с таким именем не существует");
+            System.out.println("Пользователя с таким именем не существует");
+            return null;
         }
         String savedPassword = authDetails.get(username);
-        if (!savedPassword.equals(password))
-            throw new AccessDenialException("Введен некорректный пароль");
+        if (!savedPassword.equals(password)) {
+            System.out.println("Введен некорректный пароль");
+            return null;
+        }
         System.out.println("Пользователь " + username + " вошел в сеть.");
+        return username;
     }
 }

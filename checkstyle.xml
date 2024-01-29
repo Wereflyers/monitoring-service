@@ -15,6 +15,12 @@
 			<property name="regexp" value="true"/>
 			<property name="illegalPkgs" value=".*\.shaded\..*"/>
 		</module>
+		<module name="IllegalImport">
+			<property name="regexp" value="true"/>
+			<property name="illegalClasses"
+					  value="^org\.junit\.Test, ^org\.junit\.jupiter\.api\.Assertions, ^org\.junit\.Test, ^org\.junit\.jupiter\.api\.Assertions\..*"/>
+			<property name="illegalPkgs" value="^org\.hamcrest"/>
+		</module>
 		<module name="OuterTypeFilename"/>
 		<module name="IllegalTokenText">
 			<property name="tokens" value="STRING_LITERAL, CHAR_LITERAL"/>

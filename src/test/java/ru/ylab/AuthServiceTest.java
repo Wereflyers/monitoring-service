@@ -2,15 +2,14 @@ package ru.ylab;
 
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.ylab.exception.AccessDenialException;
 import ru.ylab.service.AuthService;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Java6Assertions.assertThat;
 
 class AuthServiceTest {
     private AuthService authService;
@@ -21,6 +20,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName(value = "Тест успешной регистрации пользователя")
     @SneakyThrows
     void registerUserTest() {
         authService.registerUser("name", "pass");
@@ -30,25 +30,32 @@ class AuthServiceTest {
         privateField.setAccessible(true);
         HashMap<String, String> map = (HashMap<String, String>) privateField.get(authService);
 
-        assertEquals("pass", map.get("name"));
+        assertThat(map.get("name"))
+                .isEqualTo("pass");
     }
 
     @Test
+    @DisplayName(value = "Тест регистрации уже зарегистрированного пользователя")
     void registerUserTest_whenAlreadyRegistered() {
         authService.registerUser("name", "pass");
 
-        assertThrows(AccessDenialException.class, () -> authService.registerUser("name", "p"));
+        assertThat(authService.registerUser("name", "p"))
+                .isNull();
     }
 
     @Test
+    @DisplayName(value = "Тест авторизации пользователя с неверным паролем")
     void authUserTest_whenPasswordsNotMatch() {
         authService.registerUser("name", "pass");
 
-        assertThrows(AccessDenialException.class, () -> authService.authUser("name", "p"));
+        assertThat(authService.authUser("name", "p"))
+                .isNull();
     }
 
     @Test
+    @DisplayName(value = "Тест авторизации незарегистрированного пользователя")
     void authUserTest_whenNotRegistered() {
-        assertThrows(AccessDenialException.class, () -> authService.authUser("name", "p"));
+        assertThat(authService.authUser("name", "p"))
+                .isNull();
     }
 }

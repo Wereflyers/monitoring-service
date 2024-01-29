@@ -1,7 +1,7 @@
 package ru.ylab.dto;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * The list of Indication types.
@@ -10,7 +10,7 @@ public class IndicationType {
     /**
      * List of types
      */
-    public static final List<String> types = new ArrayList<>();
+    public static final Set<String> types = new HashSet<>();
 
     static {
         types.add("ГВ");
