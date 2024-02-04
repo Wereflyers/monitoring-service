@@ -1,37 +1,36 @@
 package ru.ylab.service;
 
-import ru.ylab.dto.Indication;
+import lombok.RequiredArgsConstructor;
+import ru.ylab.model.Indication;
+import ru.ylab.repository.MonitoringRepository;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
 
 /**
  * Monitoring service is responsible for business logic.
  */
+@RequiredArgsConstructor
 public class MonitoringService {
     /**
-     * HashMap<K, V> with all sent indications
-     * K - username
-     * V - indications
+     * Injection of Repository.
      */
-    private final HashMap<String, List<Indication>> indications = new HashMap<>();
+    private final MonitoringRepository monitoringRepository;
 
     /**
      * Send indication.
      *
-     * @param username   the username
-     * @param date       the date of indication
-     * @param value value of the indication
+     * @param typeId id of the type of the indication
+     * @param username the username
+     * @param date     the date of indication
+     * @param value    value of the indication
      */
-    public void sendIndication(String type, String username, LocalDate date, Long value) {
-        List<Indication> userIndications = indications.get(username);
-        if (userIndications == null) {
-            userIndications = new ArrayList<>();
-        } else if (!userIndications.isEmpty()) {
-            Indication lastIndication = getLastIndication(type, username);
+    public void sendIndication(long typeId, String username, LocalDate date, Long value) {
+        try {
+            Indication lastIndication = monitoringRepository.getLastIndication(typeId, username);
             if (lastIndication != null) {
                 int newIndicationYear = date.getYear();
                 Month newIndicationMonth = date.getMonth();
@@ -45,66 +44,50 @@ public class MonitoringService {
                     return;
                 }
             }
+            monitoringRepository.sendIndication(username, new Indication(date, value), typeId);
+        } catch (SQLException e) {
+            System.out.println("SQLException occurred " + e.getSQLState());
+            e.printStackTrace();
         }
-        userIndications.add(new Indication(type, date, value));
-        indications.put(username, userIndications);
     }
 
     /**
      * Check indication for the month.
      *
      * @param username the username
+     * @param type id of the type of the indication
      * @param month    the month
      * @return the value of indication
      */
-    public Long checkIndicationForMonth(String username, String indicationType, int month) {
-        List<Indication> userIndications = indications.get(username);
-        if (userIndications != null) {
-            int requestedYear = LocalDate.now().getYear();
-            Month requestesMonth = Month.of(month);
-            for (Indication indication : userIndications) {
-                if (indication.getDate().getYear() == requestedYear
-                        && indication.getDate().getMonth() == requestesMonth
-                        && indication.getType().equals(indicationType))
-                    return indication.getValue();
-            }
+    public Long checkIndicationForMonth(String username, long type, int month) {
+        try {
+            return monitoringRepository.checkIndicationForMonth(username, type, month);
+        } catch (SQLException e) {
+            System.out.println("SQLException occurred " + e.getSQLState());
+            e.printStackTrace();
+            return null;
         }
-        System.out.println("Нет показаний за этот месяц");
-        return null;
     }
 
     /**
      * Get the last indication.
      *
+     * @param type id of the type of the indication
      * @param username the username
      * @return the value
      */
-    public String checkLastIndicationAmount(String indicationType, String username) {
-        Indication lastIndication = getLastIndication(indicationType, username);
-        if (lastIndication == null) {
-            return "Нет введенных показаний";
-        }
-        return String.valueOf(lastIndication.getValue());
-    }
-
-    /**
-     * Get the last indication
-     *
-     * @param indicationType String
-     * @param username String
-     * @return indication of a known type or null
-     */
-    private Indication getLastIndication(String indicationType, String username) {
-        List<Indication> userIndications = indications.get(username);
-        if (userIndications != null) {
-            for (int i = userIndications.size() - 1; i >= 0; i--) {
-                Indication lastIndication = userIndications.get(i);
-                if (lastIndication.getType().equals(indicationType)) {
-                    return lastIndication;
-                }
+    public String checkLastIndicationAmount(long type, String username) {
+        try {
+            Indication lastIndication = monitoringRepository.getLastIndication(type, username);
+            if (lastIndication == null) {
+                return "Нет введенных показаний";
             }
+            return String.valueOf(lastIndication.getValue());
+        } catch (SQLException e) {
+            System.out.println("SQLException occurred " + e.getSQLState());
+            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     /**
@@ -113,12 +96,20 @@ public class MonitoringService {
      * @return all indications values
      */
     public String getAllIndications() {
-        StringBuilder sb = new StringBuilder();
-        for (String user : indications.keySet()) {
-            sb.append(user).append(System.lineSeparator());
-            sb.append(getAllIndicationsOfUser(user));
+        try {
+            List<Indication> indications = monitoringRepository.getAllIndications();
+            StringBuilder sb = new StringBuilder();
+            if (indications != null) {
+                indications.stream()
+                        .sorted(Comparator.comparing(Indication::getUsername))
+                        .forEach(i -> sb.append(i).append(System.lineSeparator()));
+            }
+            return sb.toString();
+        } catch (SQLException e) {
+            System.out.println("SQLException occurred " + e.getSQLState());
+            e.printStackTrace();
+            return null;
         }
-        return sb.toString();
     }
 
     /**
@@ -128,15 +119,18 @@ public class MonitoringService {
      * @return all user's indications values
      */
     public String getAllIndicationsOfUser(String username) {
-        List<Indication> userIndications = indications.get(username);
-        if (userIndications != null) {
-            StringBuilder sb = new StringBuilder();
-            for (Indication indication : userIndications) {
-                sb.append(indication.getType()).append(" ").append(indication.getDate()).append(" - ")
-                        .append(indication.getValue()).append(System.lineSeparator());
+        try {
+            List<Indication> userIndications = monitoringRepository.getAllIndicationsOfUser(username);
+            if (userIndications != null) {
+                StringBuilder sb = new StringBuilder();
+                userIndications.forEach(i -> sb.append(i).append(System.lineSeparator()));
+                return sb.toString();
             }
-            return sb.toString();
+            return "Нет введенных показаний";
+        } catch (SQLException e) {
+            System.out.println("SQLException occurred " + e.getSQLState());
+            e.printStackTrace();
+            return null;
         }
-        return "Нет введенных показаний";
     }
 }

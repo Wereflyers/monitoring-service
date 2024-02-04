@@ -18,10 +18,21 @@
         <mockito.version>5.10.0</mockito.version>
         <junit.version>5.6.2</junit.version>
         <assertj.version>3.4.1</assertj.version>
+        <postgresql.version>42.2.10</postgresql.version>
+        <snakeyaml.version>1.23</snakeyaml.version>
+        <testcontainer.version>1.19.4</testcontainer.version>
+        <junit.testcontainer.version>1.15.0</junit.testcontainer.version>
+        <docker.db.url.jdbc>jdbc:postgresql://monitoring-db:5432/monitoring</docker.db.url.jdbc>
+        <docker.db.username.jdbc>monitor</docker.db.username.jdbc>
+        <docker.db.password.jdbc>monitor</docker.db.password.jdbc>
+        <docker.db.driver.jdbc>org.postgresql.Driver</docker.db.driver.jdbc>
         <maven.checkstyle.version>3.1.2</maven.checkstyle.version>
         <spotbugs.maven.version>4.7.0.0</spotbugs.maven.version>
         <jacoco.maven.version>0.8.8</jacoco.maven.version>
         <puppycrawl.version>10.3</puppycrawl.version>
+        <slf4j.version>1.7.24</slf4j.version>
+        <logback.version>1.2.3</logback.version>
+        <liquibase.version>4.8.0</liquibase.version>
     </properties>
 
     <dependencies>
@@ -51,11 +62,72 @@
             <version>${assertj.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!--JDBC drivers-->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>${liquibase.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${testcontainer.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${testcontainer.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <addClasspath>true</addClasspath>
+                                <mainClass>ru.ylab.MonitoringApp</mainClass>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.liquibase</groupId>
+                    <artifactId>liquibase-maven-plugin</artifactId>
+                    <version>4.15.0</version>
+                    <configuration>
+                        <changeLogFile>${liquibase.changeLogFile}</changeLogFile>
+                        <url>${liquibase.url}</url>
+                        <username>${liquibase.username}</username>
+                        <password>${liquibase.password}</password>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>clearCheckSums</goal>
+                                <goal>update</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
@@ -179,6 +251,15 @@
         </pluginManagement>
     </build>
     <profiles>
+        <profile>
+            <id>docker</id>
+            <properties>
+                <liquibase.changeLogFile>dev/changelog.xml</liquibase.changeLogFile>
+                <liquibase.url>${docker.db.url.jdbc}</liquibase.url>
+                <liquibase.username>${docker.db.username.jdbc}</liquibase.username>
+                <liquibase.password>${docker.db.password.jdbc}</liquibase.password>
+            </properties>
+        </profile>
         <profile>
             <id>check</id>
             <build>
