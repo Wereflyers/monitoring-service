@@ -1,7 +1,9 @@
 package ru.ylab.in;
 
-import ru.ylab.dto.IndicationType;
+import lombok.RequiredArgsConstructor;
+import ru.ylab.model.IndicationType;
 import ru.ylab.service.AuthService;
+import ru.ylab.service.IndicationTypeService;
 import ru.ylab.service.MonitoringService;
 
 import java.time.LocalDate;
@@ -12,6 +14,7 @@ import java.util.Scanner;
 /**
  * MonitoringController is responsible for receiving requests from the console
  */
+@RequiredArgsConstructor
 public class MonitoringController {
     /**
      * Monitoring Service Exemplar
@@ -22,23 +25,17 @@ public class MonitoringController {
      */
     private final AuthService authService;
     /**
+     * Type Service Exemplar
+     */
+    private final IndicationTypeService indicationTypeService;
+    /**
      * List of all users' actions
      */
-    private final List<String> userAuditTrail;
+    private final List<String> userAuditTrail = new ArrayList<>();
     /**
      * Scan from the console
      */
     private final Scanner scanner;
-
-    /**
-     * Instantiates a new Distributive service, initializes all variables.
-     */
-    public MonitoringController(Scanner scanner, MonitoringService monitoringService, AuthService authService) {
-        this.monitoringService = monitoringService;
-        this.authService = authService;
-        this.userAuditTrail = new ArrayList<>();
-        this.scanner = scanner;
-    }
 
     /**
      * Distribute requests of admin and user.
@@ -71,10 +68,10 @@ public class MonitoringController {
                     addIndication(name);
                     break;
                 case 2:
-                    String indicationType = getIndicationType();
-                    System.out.println(monitoringService.checkLastIndicationAmount(indicationType, name));
+                    IndicationType indicationType = getIndicationType();
+                    System.out.println(monitoringService.checkLastIndicationAmount(indicationType.getId(), name));
                     userAuditTrail.add("Пользователем " + name + " просмотрено последнее показание показание счетчика "
-                    + indicationType);
+                    + indicationType.getName());
                     break;
                 case 3:
                     getIndicationForMonth(name);
@@ -94,6 +91,11 @@ public class MonitoringController {
         }
     }
 
+    /**
+     * Get indication for the month
+     *
+     * @param name the name of the user
+     */
     private void getIndicationForMonth(String name) {
         int month;
         while (true) {
@@ -102,13 +104,18 @@ public class MonitoringController {
                 month = Integer.parseInt(scanner.nextLine());
                 break;
             } catch (NumberFormatException e) {
-                System.out.println("Ыыедите корректное число");
+                System.out.println("Введите корректное число");
             }
         }
-        String indicationType = getIndicationType();
-        System.out.println(monitoringService.checkIndicationForMonth(name, indicationType, month));
+        IndicationType indicationType = getIndicationType();
+        Long value = monitoringService.checkIndicationForMonth(name, indicationType.getId(), month);
+        if (value != null) {
+            System.out.println(value);
+        } else {
+            System.out.println("Нет показаний за этот месяц");
+        }
         userAuditTrail.add("Пользователем " + name +
-                " просмотрено последнее показание показание счетчика за месяц " + month);
+                " просмотрено последнее показание показание счетчика " + indicationType.getName() + " за месяц");
     }
 
     /**
@@ -117,11 +124,21 @@ public class MonitoringController {
      * @param name username
      */
     private void addIndication(String name) {
-        String indicationType = getIndicationType();
+        IndicationType indicationType = getIndicationType();
         System.out.println("Введите показания (целое число)");
-        long value = Long.parseLong(scanner.nextLine());
-        monitoringService.sendIndication(indicationType, name, LocalDate.now(), value);
-        userAuditTrail.add("Пользователем " + name + " отправлено показание счетчика" + value);
+        long value;
+        while (true) {
+            try {
+                value = Long.parseLong(scanner.nextLine());
+                if (value >= 0) {
+                    break;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Введите корректное число");
+            }
+        }
+        monitoringService.sendIndication(indicationType.getId(), name, LocalDate.now(), value);
+        userAuditTrail.add("Пользователем " + name + " отправлено показание счетчика " + indicationType.getName());
     }
 
     /**
@@ -129,14 +146,15 @@ public class MonitoringController {
      *
      * @return indication type
      */
-    private String getIndicationType() {
+    private IndicationType getIndicationType() {
         while (true) {
-            System.out.println("Введите тип показания " + IndicationType.types);
-            String indicationType = scanner.nextLine();
-            if (IndicationType.types.contains(indicationType)) {
-                return indicationType;
-            } else {
+            System.out.println("Введите тип показания " + indicationTypeService.getAllTypes());
+            String typeName = scanner.nextLine();
+            IndicationType type = indicationTypeService.getType(typeName);
+            if (type == null) {
                 System.out.println("Некорректный тип показания");
+            } else {
+                return type;
             }
         }
     }
@@ -184,7 +202,7 @@ public class MonitoringController {
                 case 3:
                     System.out.println("Введите тип показаний");
                     String newType = scanner.nextLine();
-                    IndicationType.addType(newType);
+                    indicationTypeService.addType(newType);
                     break;
                 case 4:
                     return getAuthenticationSteps();
@@ -247,12 +265,31 @@ public class MonitoringController {
         return name;
     }
 
+    /**
+     * Security steps
+     *
+     * @param step log in or auth
+     * @return username
+     */
     private String logIn(int step) {
         System.out.println("Введите имя пользователя:");
-        String name = scanner.nextLine();
-        System.out.println("Введите пароль:");
-        String password = scanner.nextLine();
+        String name;
+        do {
+            name = scanner.nextLine();
+        } while (name == null || name.isBlank());
 
-        return (step == 1) ? authService.registerUser(name, password) : authService.authUser(name, password);
+        System.out.println("Введите пароль:");
+        String password;
+        do {
+            password = scanner.nextLine();
+        } while (password == null || password.isBlank());
+
+        if (step == 1) {
+            userAuditTrail.add("Пользователь " + name + " - попытка регистрации");
+            return authService.registerUser(name, password);
+        } else {
+            userAuditTrail.add("Пользователь " + name + " - попытка входа");
+            return authService.authUser(name, password);
+        }
     }
 }

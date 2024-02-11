@@ -1,25 +1,20 @@
 package ru.ylab.service;
 
-import java.util.HashMap;
+import lombok.RequiredArgsConstructor;
+import ru.ylab.model.User;
+import ru.ylab.repository.AuthRepository;
+
+import java.sql.SQLException;
 
 /**
  * AuthService is responsible for registration and authorization
  */
+@RequiredArgsConstructor
 public class AuthService {
     /**
-     * HashMap<K, V> is a collection of users
-     * K - username
-     * V - password
+     * Repository with users.
      */
-    private final HashMap<String, String> authDetails;
-
-    /**
-     * Instantiates a new Auth service.
-     */
-    public AuthService() {
-        authDetails = new HashMap<>();
-        authDetails.put("admin", "PASSWORD123");
-    }
+    private final AuthRepository authRepository;
 
     /**
      * Register user.
@@ -29,13 +24,17 @@ public class AuthService {
      * @return username
      */
     public String registerUser(String username, String password) {
-        if (authDetails.containsKey(username)) {
-            System.out.println("Такой пользователь уже зарегистрирован");
+        try {
+            if (authRepository.ifExistUser(username)) {
+                System.out.println("Такой пользователь уже зарегистрирован");
+                return null;
+            }
+            return authRepository.registerUser(username, password);
+        } catch (SQLException e) {
+            System.out.println("SQLException occurred " + e.getSQLState());
+            e.printStackTrace();
             return null;
         }
-        authDetails.put(username, password);
-        System.out.println("Пользователь успешно зарегистрирован");
-        return username;
     }
 
     /**
@@ -46,16 +45,22 @@ public class AuthService {
      * @return username
      */
     public String authUser(String username, String password) {
-        if (!authDetails.containsKey(username)) {
-            System.out.println("Пользователя с таким именем не существует");
+        try {
+            User savedUser = authRepository.getUser(username);
+            if (savedUser == null) {
+                System.out.println("Пользователя с таким именем не существует");
+                return null;
+            }
+            if (!password.equals(savedUser.getPassword())) {
+                System.out.println("Введен некорректный пароль");
+                return null;
+            }
+            System.out.println("Пользователь " + username + " вошел в сеть.");
+            return username;
+        } catch (SQLException e) {
+            System.out.println("SQLException occurred " + e.getSQLState());
+            e.printStackTrace();
             return null;
         }
-        String savedPassword = authDetails.get(username);
-        if (!savedPassword.equals(password)) {
-            System.out.println("Введен некорректный пароль");
-            return null;
-        }
-        System.out.println("Пользователь " + username + " вошел в сеть.");
-        return username;
     }
 }
