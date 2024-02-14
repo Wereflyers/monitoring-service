@@ -60,7 +60,7 @@ class GetLastIndicationServletTest {
         when(request.getParameter("type")).thenReturn("ГВ");
         when(request.getHeader("username")).thenReturn(username);
         when(indicationTypeService.getType("ГВ")).thenReturn(new IndicationType(1L, "ГВ"));
-        when(authService.isUserExist(username)).thenReturn(true);
+        when(authService.hasUser(username)).thenReturn(true);
         when(monitoringService.getLastIndication(1L, username)).thenReturn(indication);
         when(objectMapper.writeValueAsString(any())).thenReturn("string");
         when(response.getWriter()).thenReturn(out);
@@ -81,7 +81,7 @@ class GetLastIndicationServletTest {
         String username = "name";
 
         when(request.getParameter("type")).thenReturn("bb");
-        when(authService.isUserExist(username)).thenReturn(true);
+        when(authService.hasUser(username)).thenReturn(true);
         when(request.getHeader("username")).thenReturn(username);
         when(indicationTypeService.getType("bb")).thenReturn(null);
 

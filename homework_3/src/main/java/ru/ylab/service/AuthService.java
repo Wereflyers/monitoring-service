@@ -37,7 +37,7 @@ public class AuthService {
      */
     public String registerUser(User user) {
         try {
-            if (authRepository.ifExistUser(user.getUsername())) {
+            if (authRepository.hasUser(user.getUsername())) {
                 throw new UserAlreadyRegisteredException("Такой пользователь уже зарегистрирован");
             }
             return authRepository.registerUser(user.getUsername(), user.getPassword());
@@ -73,9 +73,9 @@ public class AuthService {
      * @param name the name
      * @return the boolean
      */
-    public boolean isUserExist(String name) {
+    public boolean hasUser(String name) {
         try {
-            return authRepository.ifExistUser(name);
+            return authRepository.hasUser(name);
         } catch (SQLException e) {
             return false;
         }

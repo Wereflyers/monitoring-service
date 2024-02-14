@@ -25,7 +25,7 @@ public interface AuthRepository {
      * @return boolean
      * @throws SQLException the sql exception
      */
-    boolean ifExistUser(String username) throws SQLException;
+    boolean hasUser(String username) throws SQLException;
 
     /**
      * Auth user.

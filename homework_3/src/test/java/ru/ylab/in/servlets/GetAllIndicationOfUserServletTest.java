@@ -54,7 +54,7 @@ class GetAllIndicationOfUserServletTest {
 
         when(request.getHeader("username")).thenReturn(username);
         when(monitoringService.getAllIndicationsOfUser(username)).thenReturn(List.of(indication));
-        when(authService.isUserExist(username)).thenReturn(true);
+        when(authService.hasUser(username)).thenReturn(true);
         when(objectMapper.writeValueAsString(any())).thenReturn("string");
         when(response.getWriter()).thenReturn(out);
 

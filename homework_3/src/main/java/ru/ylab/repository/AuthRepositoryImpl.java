@@ -30,7 +30,7 @@ public class AuthRepositoryImpl implements AuthRepository {
     }
 
     @Override
-    public boolean ifExistUser(String username) throws SQLException {
+    public boolean hasUser(String username) throws SQLException {
         try (Connection connection = config.connect()) {
             String checkDataSql = "SELECT " +
                     "EXISTS(SELECT * FROM users_table WHERE username = ?)";

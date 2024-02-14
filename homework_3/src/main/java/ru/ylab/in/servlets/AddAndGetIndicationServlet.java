@@ -18,12 +18,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * The type Add indication servlet.
  */
 @Loggable
-public class AddIndicationServlet extends HttpServlet {
+public class AddAndGetIndicationServlet extends HttpServlet {
     /**
      * Mapper Json
      */
@@ -59,9 +60,8 @@ public class AddIndicationServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json; charset=UTF-8");
 
-        String username = req.getHeader("username");
-        if (username == null || !authService.isUserExist(username) || username.equals("admin")) {
-            resp.setStatus(403);
+        String username = getValidUsername(req);
+        if (username.equals("admin")) {
             throw new NoRightsException("Вы имеете недостаточно прав для выполнения данной операции");
         }
 
@@ -77,6 +77,29 @@ public class AddIndicationServlet extends HttpServlet {
         out.write(json);
     }
 
+    /**
+     * Get all indications (admin)
+     * @param req request
+     * @param resp response
+     * @throws IOException
+     */
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String username = getValidUsername(req);
+
+        if (!username.equals("admin")) {
+            throw new NoRightsException("Вы имеете недостаточно прав для выполнения данной операции");
+        }
+
+        List<IndicationDto> indications = IndicationMapper.INSTANCE.listOfIndicationToDto(
+                monitoringService.getAllIndications());
+        String result = objectMapper.writeValueAsString(indications);
+        resp.setContentType("application/json; charset=UTF-8");
+        resp.setStatus(HttpServletResponse.SC_OK);
+        PrintWriter out = resp.getWriter();
+        out.write(result);
+    }
+
     private void validateIndication(IndicationDto indicationDto) {
         if (indicationDto.getValue() == null || indicationDto.getValue() < 0) {
             throw new WrongDataException("Некорректное показание");
@@ -84,6 +107,24 @@ public class AddIndicationServlet extends HttpServlet {
         if (indicationDto.getType() == null) {
             throw new WrongDataException("Некорректный тип показания");
         }
+    }
+
+    /**
+     * Gets valid username.
+     *
+     * @param req         the req
+     */
+    private String getValidUsername(HttpServletRequest req) {
+        String username;
+        try {
+            username = req.getHeader("username");
+        } catch (NullPointerException e) {
+            throw new WrongDataException("Введите имя пользователя");
+        }
+        if (username == null || !authService.hasUser(username)) {
+            throw new NoRightsException("Вы имеете недостаточно прав для выполнения данной операции");
+        }
+        return username;
     }
 }
 

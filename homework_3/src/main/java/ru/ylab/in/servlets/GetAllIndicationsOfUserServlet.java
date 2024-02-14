@@ -9,13 +9,13 @@ import ru.ylab.aop.annotations.Loggable;
 import ru.ylab.dto.IndicationDto;
 import ru.ylab.dto.mapper.IndicationMapper;
 import ru.ylab.exceptions.NoRightsException;
+import ru.ylab.exceptions.WrongDataException;
 import ru.ylab.service.AuthService;
 import ru.ylab.service.MonitoringService;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * The type Get all indications of user servlet.
@@ -54,14 +54,18 @@ public class GetAllIndicationsOfUserServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String username = req.getHeader("username");
-        if (username == null || !authService.isUserExist(username) || username.equals("admin")) {
+        String username;
+        try {
+            username = req.getHeader("username");
+        } catch (NullPointerException e) {
+            throw new WrongDataException("Введите имя пользователя");
+        }
+        if (username == null || !authService.hasUser(username) || username.equals("admin")) {
             throw new NoRightsException("Вы имеете недостаточно прав для выполнения данной операции");
         }
 
-        List<IndicationDto> indications = monitoringService.getAllIndicationsOfUser(username).stream()
-                .map(IndicationMapper.INSTANCE::indicationToDto)
-                .collect(Collectors.toList());
+        List<IndicationDto> indications = IndicationMapper.INSTANCE.listOfIndicationToDto(
+                monitoringService.getAllIndicationsOfUser(username));
         String result = objectMapper.writeValueAsString(indications);
         resp.setContentType("application/json; charset=UTF-8");
         resp.setStatus(HttpServletResponse.SC_OK);
