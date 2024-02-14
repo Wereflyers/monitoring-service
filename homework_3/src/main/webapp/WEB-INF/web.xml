@@ -1,0 +1,97 @@
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+         http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+
+    <!--Add indication-->
+    <servlet-mapping>
+        <servlet-name>AddIndication</servlet-name>
+        <url-pattern>/indication</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AddIndication</servlet-name>
+        <servlet-class>ru.ylab.in.servlets.AddIndicationServlet</servlet-class>
+    </servlet>
+
+    <!--Get All indications for user-->
+    <servlet-mapping>
+        <servlet-name>GetAllIndicationsForUser</servlet-name>
+        <url-pattern>/indication/all</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>GetAllIndicationsForUser</servlet-name>
+        <servlet-class>ru.ylab.in.servlets.GetAllIndicationsOfUserServlet</servlet-class>
+    </servlet>
+
+    <!--Get All indications-->
+    <servlet-mapping>
+        <servlet-name>GetAllIndications</servlet-name>
+        <url-pattern>/indication/all/admin</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>GetAllIndications</servlet-name>
+        <servlet-class>ru.ylab.in.servlets.GetAllIndicationsServlet</servlet-class>
+    </servlet>
+
+    <!--Get the Last indication-->
+    <servlet-mapping>
+        <servlet-name>GetLastIndication</servlet-name>
+        <url-pattern>/indication/last</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>GetLastIndication</servlet-name>
+        <servlet-class>ru.ylab.in.servlets.GetLastIndicationServlet</servlet-class>
+    </servlet>
+
+    <!--Get the indication of Month-->
+    <servlet-mapping>
+        <servlet-name>GetIndicationForMonth</servlet-name>
+        <url-pattern>/indication/month</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>GetIndicationForMonth</servlet-name>
+        <servlet-class>ru.ylab.in.servlets.GetLastIndicationForMonthServlet</servlet-class>
+    </servlet>
+
+    <!--Add an indication type-->
+    <servlet-mapping>
+        <servlet-name>AddIndicationType</servlet-name>
+        <url-pattern>/indication/type</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AddIndicationType</servlet-name>
+        <servlet-class>ru.ylab.in.servlets.AddIndicationTypeServlet</servlet-class>
+    </servlet>
+
+    <!--Get all indication types-->
+    <servlet-mapping>
+        <servlet-name>GetIndicationTypes</servlet-name>
+        <url-pattern>/indication/type/all</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>GetIndicationTypes</servlet-name>
+        <servlet-class>ru.ylab.in.servlets.GetAllIndicationTypesServlet</servlet-class>
+    </servlet>
+
+    <!-- Catch exception-->
+    <servlet>
+        <servlet-name>ExceptionHandler</servlet-name>
+        <servlet-class>ru.ylab.exceptions.ExceptionHandler</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ExceptionHandler</servlet-name>
+        <url-pattern>/exception</url-pattern>
+    </servlet-mapping>
+    <error-page>
+        <exception-type>java.lang.Throwable</exception-type>
+        <location>/exception</location>
+    </error-page>
+</web-app>
