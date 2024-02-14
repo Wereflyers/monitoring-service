@@ -1,9 +1,0 @@
-FROM maven:3.6.3-openjdk-11
-
-RUN mkdir monitoring
-
-WORKDIR monitoring
-
-COPY . .
-
-CMD ["mvn", "liquibase:update", "-Pdocker"]
