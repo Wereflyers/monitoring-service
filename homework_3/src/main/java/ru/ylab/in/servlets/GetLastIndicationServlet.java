@@ -62,8 +62,13 @@ public class GetLastIndicationServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         req.setCharacterEncoding("UTF-8");
 
-        String username = req.getHeader("username");
-        if (username == null || !authService.isUserExist(username) || username.equals("admin")) {
+        String username;
+        try {
+            username = req.getHeader("username");
+        } catch (NullPointerException e) {
+            throw new WrongDataException("Введите имя пользователя");
+        }
+        if (username == null || !authService.hasUser(username) || username.equals("admin")) {
             throw new NoRightsException("Вы имеете недостаточно прав для выполнения данной операции");
         }
 

@@ -65,11 +65,11 @@ class AuthRepositoryTest {
     @DisplayName("Определение существования пользователя")
     public void ifExistUserTest() {
         when(config.connect()).thenReturn(JDBCConfigTest.connect());
-        boolean res = authRepository.ifExistUser("n");
+        boolean res = authRepository.hasUser("n");
         assertThat(res).isEqualTo(false);
 
         when(config.connect()).thenReturn(JDBCConfigTest.connect());
-        boolean res2 = authRepository.ifExistUser("admin");
+        boolean res2 = authRepository.hasUser("admin");
         assertThat(res2).isEqualTo(true);
     }
 }

@@ -4,15 +4,15 @@
          http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
 
-    <!--Add indication-->
+    <!--Add indication ot det all indications (user)-->
     <servlet-mapping>
-        <servlet-name>AddIndication</servlet-name>
+        <servlet-name>GetAllOrAddIndication</servlet-name>
         <url-pattern>/indication</url-pattern>
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>AddIndication</servlet-name>
-        <servlet-class>ru.ylab.in.servlets.AddIndicationServlet</servlet-class>
+        <servlet-name>GetAllOrAddIndication</servlet-name>
+        <servlet-class>ru.ylab.in.servlets.AddAndGetIndicationServlet</servlet-class>
     </servlet>
 
     <!--Get All indications for user-->
@@ -24,17 +24,6 @@
     <servlet>
         <servlet-name>GetAllIndicationsForUser</servlet-name>
         <servlet-class>ru.ylab.in.servlets.GetAllIndicationsOfUserServlet</servlet-class>
-    </servlet>
-
-    <!--Get All indications-->
-    <servlet-mapping>
-        <servlet-name>GetAllIndications</servlet-name>
-        <url-pattern>/indication/all/admin</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>GetAllIndications</servlet-name>
-        <servlet-class>ru.ylab.in.servlets.GetAllIndicationsServlet</servlet-class>
     </servlet>
 
     <!--Get the Last indication-->

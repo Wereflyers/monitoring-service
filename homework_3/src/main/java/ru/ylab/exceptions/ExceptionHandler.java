@@ -87,7 +87,7 @@ public class ExceptionHandler extends HttpServlet {
 			}
 
 			ApiError error = new ApiError(servletName + " " + requestUri + " throws exception.",
-					throwable.getMessage());
+					throwable.getMessage(), response.getStatus());
 
 			out.write(objectMapper.writeValueAsString(error));
 			throwable.printStackTrace();

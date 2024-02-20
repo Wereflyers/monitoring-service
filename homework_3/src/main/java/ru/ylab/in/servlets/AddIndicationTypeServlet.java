@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import ru.ylab.aop.annotations.Loggable;
 import ru.ylab.dto.IndicationTypeDto;
 import ru.ylab.exceptions.NoRightsException;
+import ru.ylab.exceptions.WrongDataException;
 import ru.ylab.service.IndicationTypeService;
 
 import java.io.IOException;
@@ -46,7 +47,12 @@ public class AddIndicationTypeServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         req.setCharacterEncoding("UTF-8");
-        String username = req.getHeader("username");
+        String username;
+        try {
+            username = req.getHeader("username");
+        } catch (NullPointerException e) {
+            throw new WrongDataException("Введите имя пользователя");
+        }
         if (!username.equals("admin")) {
             throw new NoRightsException("Вы имеете недостаточно прав для выполнения данной операции");
         }

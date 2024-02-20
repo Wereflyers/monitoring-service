@@ -7,6 +7,7 @@ import ru.ylab.dto.IndicationDto;
 import ru.ylab.model.Indication;
 
 import java.time.LocalDate;
+import java.util.List;
 
 
 /**
@@ -37,4 +38,12 @@ public interface IndicationMapper {
      * @return the indication
      */
     Indication indicationDtoToIndication(IndicationDto indicationDto, String username, LocalDate date);
+
+    /**
+     * List of indication to dto list.
+     *
+     * @param indications the indications
+     * @return list
+     */
+    List<IndicationDto> listOfIndicationToDto(List<Indication> indications);
 }

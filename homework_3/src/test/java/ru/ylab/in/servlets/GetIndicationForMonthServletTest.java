@@ -56,7 +56,7 @@ class GetIndicationForMonthServletTest {
         when(request.getParameter("month")).thenReturn("1");
         when(request.getHeader("username")).thenReturn(username);
         when(indicationTypeService.getType("ГВ")).thenReturn(new IndicationType(1L, "ГВ"));
-        when(authService.isUserExist(username)).thenReturn(true);
+        when(authService.hasUser(username)).thenReturn(true);
         when(monitoringService.checkIndicationForMonth(username, 1L, 1)).thenReturn(123L);
         when(objectMapper.writeValueAsString(123L)).thenReturn("123");
         when(response.getWriter()).thenReturn(out);
@@ -78,7 +78,7 @@ class GetIndicationForMonthServletTest {
         when(request.getParameter("type")).thenReturn("bb");
         when(request.getParameter("month")).thenReturn("1");
         when(request.getHeader("username")).thenReturn(username);
-        when(authService.isUserExist(username)).thenReturn(true);
+        when(authService.hasUser(username)).thenReturn(true);
         when(indicationTypeService.getType("bb")).thenReturn(null);
 
         assertThatThrownBy(() -> servlet.doGet(request, response))
@@ -91,7 +91,7 @@ class GetIndicationForMonthServletTest {
    void doGetTest_whenWrongMonth() {
         when(request.getParameter("month")).thenReturn("13");
         when(request.getHeader("username")).thenReturn("name");
-        when(authService.isUserExist("name")).thenReturn(true);
+        when(authService.hasUser("name")).thenReturn(true);
 
         assertThatThrownBy(() -> servlet.doGet(request, response))
                 .isInstanceOf(WrongDataException.class);

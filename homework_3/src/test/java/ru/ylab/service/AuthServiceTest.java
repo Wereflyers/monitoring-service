@@ -31,7 +31,7 @@ class AuthServiceTest {
     void registerUserTest() {
         String expected = "name";
 
-        when(authRepository.ifExistUser("name")).thenReturn(false);
+        when(authRepository.hasUser("name")).thenReturn(false);
         when(authRepository.registerUser("name", "pass")).thenReturn("name");
 
         String actual = authService.registerUser(new User("name", "pass"));
@@ -43,7 +43,7 @@ class AuthServiceTest {
     @DisplayName(value = "Тест регистрации уже зарегистрированного пользователя")
     @SneakyThrows
     void registerUserTest_whenAlreadyRegistered() {
-        when(authRepository.ifExistUser("name")).thenReturn(true);
+        when(authRepository.hasUser("name")).thenReturn(true);
 
         assertThrows(UserAlreadyRegisteredException.class,
                 () -> authService.registerUser(new User("name", "pass")));
