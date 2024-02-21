@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+  monitoring-db:
+    image: postgres:14-alpine
+    container_name: db
+    ports:
+      - "5431:5432"
+    environment:
+      - POSTGRES_PASSWORD=monitor
+      - POSTGRES_USER=monitor
+      - POSTGRES_DB=monitoring
+      - PGDATA=/var/lib/postgresql/data
+    restart: always
+
+  lb:
+    build:
+      context: .
+      dockerfile: DockerfileLB
+    ports:
+      - "5433:5432"
+    environment:
+      - JDBC_URL=jdbc:postgresql://monitoring-db:5432/monitoring
+      - POSTGRES_USER=monitor
+      - POSTGRES_PASSWORD=monitor
+      - JDBC_DRIVER=org.postgresql.Driver
+    container_name: lb
+    depends_on:
+      - monitoring-db
