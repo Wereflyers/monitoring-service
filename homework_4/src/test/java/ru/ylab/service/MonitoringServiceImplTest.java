@@ -123,10 +123,10 @@ class MonitoringServiceImplTest {
 
         List<Indication> actual = monitoringServiceImpl.getAllIndicationsOfUser("name");
 
-        assertThat(actual.size()).isEqualTo(1);
-        assertThat(actual.get(0).getType()).isEqualTo(expected.getType());
-        assertThat(actual.get(0).getValue()).isEqualTo(expected.getValue());
-        assertThat(actual.get(0).getUsername()).isEqualTo(expected.getUsername());
+        assertThat(actual.size()).as("Indications amount").isEqualTo(1);
+        assertThat(actual.get(0).getType()).as("Indication type").isEqualTo(expected.getType());
+        assertThat(actual.get(0).getValue()).as("Indication value").isEqualTo(expected.getValue());
+        assertThat(actual.get(0).getUsername()).as("Username").isEqualTo(expected.getUsername());
     }
 
     @Test
@@ -152,9 +152,9 @@ class MonitoringServiceImplTest {
 
         List<Indication> actual = monitoringServiceImpl.getAllIndications();
 
-        assertThat(actual.size()).isEqualTo(1);
-        assertThat(actual.get(0).getType()).isEqualTo(expected.getType());
-        assertThat(actual.get(0).getValue()).isEqualTo(expected.getValue());
-        assertThat(actual.get(0).getUsername()).isEqualTo(expected.getUsername());
+        assertThat(actual.size()).as("Indications amount").isEqualTo(1);
+        assertThat(actual.get(0).getType()).as("Indication type").isEqualTo(expected.getType());
+        assertThat(actual.get(0).getValue()).as("Indication value").isEqualTo(expected.getValue());
+        assertThat(actual.get(0).getUsername()).as("Username").isEqualTo(expected.getUsername());
     }
 }
