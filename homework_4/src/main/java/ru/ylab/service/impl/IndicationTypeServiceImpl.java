@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.ylab.aop.annotations.Loggable;
 import ru.ylab.domain.model.IndicationType;
-import ru.ylab.exceptions.SomeSQLException;
+import ru.ylab.exceptions.DBException;
 import ru.ylab.exceptions.WrongDataException;
 import ru.ylab.repository.IndicationTypeRepository;
 import ru.ylab.service.IndicationTypeService;
@@ -26,7 +26,7 @@ public class IndicationTypeServiceImpl implements IndicationTypeService {
         try {
             return indicationTypeRepository.getTypeByName(typeName);
         } catch (SQLException e) {
-            throw new SomeSQLException("SQLException occurred " + e.getSQLState());
+            throw new DBException("SQLException occurred " + e.getSQLState());
         }
     }
 
@@ -35,7 +35,7 @@ public class IndicationTypeServiceImpl implements IndicationTypeService {
         try {
             return indicationTypeRepository.getAllTypes();
         } catch (SQLException e) {
-            throw new SomeSQLException("SQLException occurred " + e.getSQLState());
+            throw new DBException("SQLException occurred " + e.getSQLState());
         }
     }
 
@@ -47,7 +47,7 @@ public class IndicationTypeServiceImpl implements IndicationTypeService {
             }
             indicationTypeRepository.addType(typeName);
         } catch (SQLException e) {
-            throw new SomeSQLException("SQLException occurred " + e.getSQLState());
+            throw new DBException("SQLException occurred " + e.getSQLState());
         }
     }
 }

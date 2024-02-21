@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.ylab.aop.annotations.Loggable;
 import ru.ylab.domain.model.Indication;
 import ru.ylab.domain.model.IndicationType;
-import ru.ylab.exceptions.SomeSQLException;
+import ru.ylab.exceptions.DBException;
 import ru.ylab.exceptions.WrongDataException;
 import ru.ylab.repository.MonitoringRepository;
 import ru.ylab.service.IndicationTypeService;
@@ -58,7 +58,7 @@ public class MonitoringServiceImpl implements MonitoringService {
             monitoringRepository.sendIndication(indication, indicationType.getId());
             return monitoringRepository.getLastIndication(indicationType.getId(), indication.getUsername());
         } catch (SQLException e) {
-            throw new SomeSQLException("SQLException occurred " + e.getSQLState());
+            throw new DBException("SQLException occurred " + e.getSQLState());
         }
     }
 
@@ -67,7 +67,7 @@ public class MonitoringServiceImpl implements MonitoringService {
         try {
             return monitoringRepository.checkIndicationForMonth(username, type, month);
         } catch (SQLException e) {
-            throw new SomeSQLException("SQLException occurred " + e.getSQLState());
+            throw new DBException("SQLException occurred " + e.getSQLState());
         }
     }
 
@@ -76,7 +76,7 @@ public class MonitoringServiceImpl implements MonitoringService {
         try {
             return monitoringRepository.getLastIndication(type, username);
         } catch (SQLException e) {
-            throw new SomeSQLException("SQLException occurred " + e.getSQLState());
+            throw new DBException("SQLException occurred " + e.getSQLState());
         }
     }
 
@@ -85,7 +85,7 @@ public class MonitoringServiceImpl implements MonitoringService {
         try {
             return monitoringRepository.getAllIndications();
         } catch (SQLException e) {
-            throw new SomeSQLException("SQLException occurred " + e.getSQLState());
+            throw new DBException("SQLException occurred " + e.getSQLState());
         }
     }
 
@@ -94,7 +94,7 @@ public class MonitoringServiceImpl implements MonitoringService {
         try {
             return monitoringRepository.getAllIndicationsOfUser(username);
         } catch (SQLException e) {
-            throw new SomeSQLException("SQLException occurred " + e.getSQLState());
+            throw new DBException("SQLException occurred " + e.getSQLState());
         }
     }
 }

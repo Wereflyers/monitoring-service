@@ -59,9 +59,9 @@ public class IndicationController {
                                                           @RequestBody @Valid IndicationDto indicationDto) {
         validateUser(username);
 
-        Indication result = monitoringService.sendIndication(indicationMapper.indicationDtoToIndication(
+        Indication result = monitoringService.sendIndication(indicationMapper.toIndication(
                 indicationDto, username, LocalDate.now()));
-        return ResponseEntity.status(201).body(indicationMapper.indicationToDto(result));
+        return ResponseEntity.status(201).body(indicationMapper.toIndicationDto(result));
     }
 
     /**
@@ -75,8 +75,7 @@ public class IndicationController {
         if (!username.equals("admin")) {
             throw new NoRightsException("Вы имеете недостаточно прав для выполнения данной операции");
         }
-
-        return ResponseEntity.ok(indicationMapper.indicationsToListDto(
+        return ResponseEntity.ok(indicationMapper.toListDto(
                 monitoringService.getAllIndications()));
     }
 
@@ -90,7 +89,7 @@ public class IndicationController {
     public ResponseEntity<IndicationListDto> getAllIndicationsOfUser(@RequestHeader String username) {
         validateUser(username);
 
-        return ResponseEntity.ok(indicationMapper.indicationsToListDto(
+        return ResponseEntity.ok(indicationMapper.toListDto(
                 monitoringService.getAllIndicationsOfUser(username)));
     }
 
@@ -124,7 +123,7 @@ public class IndicationController {
             result = monitoringService.getLastIndication(indicationType.getId(), username);
         }
 
-        return ResponseEntity.ok(indicationMapper.indicationToDto(result));
+        return ResponseEntity.ok(indicationMapper.toIndicationDto(result));
     }
 
     private void validateUser(String username) {

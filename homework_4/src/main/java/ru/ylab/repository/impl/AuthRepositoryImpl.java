@@ -1,6 +1,7 @@
 package ru.ylab.repository.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.ylab.config.JDBCConfig;
 import ru.ylab.domain.model.User;
@@ -13,12 +14,9 @@ import java.sql.*;
  */
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class AuthRepositoryImpl implements AuthRepository {
     private final JDBCConfig config;
-
-    public AuthRepositoryImpl() {
-        this.config = new JDBCConfig();
-    }
 
     @Override
     public String registerUser(String username, String password) throws SQLException {
@@ -57,9 +55,10 @@ public class AuthRepositoryImpl implements AuthRepository {
             ResultSet resultSet = preparedStatement.executeQuery();
             User user = null;
             if (resultSet.next()) {
+                Long savedId = resultSet.getLong("id");
                 String savedName = resultSet.getString("username");
                 String savedPassword = resultSet.getString("password");
-                user = new User(savedName, savedPassword);
+                user = new User(savedId, savedName, savedPassword);
             }
             return user;
         }
@@ -71,9 +70,9 @@ public class AuthRepositoryImpl implements AuthRepository {
             String query = "DELETE FROM users_table";
             int deletedRows = statement.executeUpdate(query);
             if (deletedRows > 0) {
-                System.out.println("Deleted All Rows In The Table Successfully...");
+                log.info("Deleted All Rows In The Table Successfully...");
             } else {
-                System.out.println("Table already empty.");
+                log.info("Table already empty.");
             }
         }
     }

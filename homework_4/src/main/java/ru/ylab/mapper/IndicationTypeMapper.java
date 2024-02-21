@@ -18,7 +18,7 @@ public interface IndicationTypeMapper {
      * @param indicationType the indication type
      * @return the indication type dto
      */
-    IndicationTypeDto indicationTypeToDto(IndicationType indicationType);
+    IndicationTypeDto toIndicationTypeDto(IndicationType indicationType);
 
     /**
      * Indication type dto to an indication type.
@@ -27,5 +27,5 @@ public interface IndicationTypeMapper {
      * @return the indication type
      */
     @Mapping(target = "id", ignore = true)
-    IndicationType indicationTypeDtoToIndicationType(IndicationTypeDto indicationTypeDto);
+    IndicationType toIndicationType(IndicationTypeDto indicationTypeDto);
 }

@@ -2,6 +2,7 @@ package ru.ylab.repository.impl;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.ylab.config.JDBCConfig;
 import ru.ylab.domain.model.Indication;
@@ -17,12 +18,9 @@ import java.util.List;
  */
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class MonitoringRepositoryImpl implements MonitoringRepository {
     private final JDBCConfig config;
-
-    public MonitoringRepositoryImpl() {
-        this.config = new JDBCConfig();
-    }
 
     @Override
     public void sendIndication(Indication indication, long type) throws SQLException {
@@ -100,11 +98,12 @@ public class MonitoringRepositoryImpl implements MonitoringRepository {
     }
 
     private Indication getIndicationFromRow(ResultSet resultSet) throws SQLException {
+        long id = resultSet.getLong("id");
         long value = resultSet.getLong("indication_value");
         String type = resultSet.getString("type_name");
         String username = resultSet.getString("username");
         LocalDate date = resultSet.getDate("date").toLocalDate();
-        return new Indication(type, date, value, username);
+        return new Indication(id, type, date, value, username);
     }
 
     public void deleteAll() throws SQLException {
@@ -113,9 +112,9 @@ public class MonitoringRepositoryImpl implements MonitoringRepository {
             String query = "DELETE FROM indication";
             int deletedRows = statement.executeUpdate(query);
             if (deletedRows > 0) {
-                System.out.println("Deleted All Rows In The Table Successfully...");
+                log.info("Deleted All Rows In The Table Successfully...");
             } else {
-                System.out.println("Table already empty.");
+                log.info("Table already empty.");
             }
         }
     }

@@ -33,7 +33,7 @@ public class ErrorHandler {
 		return ApiError.builder()
 				.message(e.getMessage())
 				.name(e.getClass().getSimpleName())
-				.status(HttpStatus.BAD_REQUEST.toString())
+				.status(HttpStatus.BAD_REQUEST)
 				.timestamp(LocalDateTime.now().format(formatter))
 				.build();
 	}
@@ -51,7 +51,7 @@ public class ErrorHandler {
 		return ApiError.builder()
 				.message(e.getMessage())
 				.name(e.getClass().getSimpleName())
-				.status(HttpStatus.BAD_REQUEST.toString())
+				.status(HttpStatus.BAD_REQUEST)
 				.timestamp(LocalDateTime.now().format(formatter))
 				.build();
 	}
@@ -69,7 +69,7 @@ public class ErrorHandler {
 		return ApiError.builder()
 				.message(e.getMessage())
 				.name(e.getClass().getSimpleName())
-				.status(HttpStatus.CONFLICT.toString())
+				.status(HttpStatus.CONFLICT)
 				.timestamp(LocalDateTime.now().format(formatter))
 				.build();
 	}
@@ -87,7 +87,7 @@ public class ErrorHandler {
 		return ApiError.builder()
 				.message(e.getMessage())
 				.name(e.getClass().getSimpleName())
-				.status(HttpStatus.FORBIDDEN.toString())
+				.status(HttpStatus.FORBIDDEN)
 				.timestamp(LocalDateTime.now().format(formatter))
 				.build();
 	}
@@ -105,7 +105,7 @@ public class ErrorHandler {
 		return ApiError.builder()
 				.message(e.getMessage())
 				.name(e.getClass().getSimpleName())
-				.status(HttpStatus.NOT_FOUND.toString())
+				.status(HttpStatus.NOT_FOUND)
 				.timestamp(LocalDateTime.now().format(formatter))
 				.build();
 	}
@@ -123,7 +123,7 @@ public class ErrorHandler {
 		return ApiError.builder()
 				.message(e.getMessage())
 				.name(e.getClass().getSimpleName())
-				.status(HttpStatus.INTERNAL_SERVER_ERROR.toString())
+				.status(HttpStatus.INTERNAL_SERVER_ERROR)
 				.timestamp(LocalDateTime.now().format(formatter))
 				.build();
 	}

@@ -19,5 +19,5 @@ public interface UserMapper {
      * @return the user
      */
     @Mapping(target = "id", ignore = true)
-    User userDtoToUser(UserDto userDto);
+    User toUser(UserDto userDto);
 }

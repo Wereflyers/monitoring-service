@@ -38,7 +38,7 @@ class MonitoringServiceImplTest {
         when(indicationTypeServiceImpl.getType("ГВ")).thenReturn(new IndicationType(1L, "ГВ"));
         when(monitoringRepository.getLastIndication(1L, "name")).thenReturn(null);
 
-        monitoringServiceImpl.sendIndication(new Indication("ГВ", LocalDate.now(), 123L, "name"));
+        monitoringServiceImpl.sendIndication(new Indication(1L, "ГВ", LocalDate.now(), 123L, "name"));
 
         verify(monitoringRepository).sendIndication(any(), anyLong());
     }
@@ -52,7 +52,7 @@ class MonitoringServiceImplTest {
                 .thenReturn(new Indication(LocalDate.now(), 123L));
 
         verify(monitoringRepository, never()).sendIndication(any(), anyLong());
-        assertThatThrownBy(() -> monitoringServiceImpl.sendIndication(new Indication("ГВ",
+        assertThatThrownBy(() -> monitoringServiceImpl.sendIndication(new Indication(1L, "ГВ",
                 LocalDate.now(), 133L, "name")))
                 .isInstanceOf(WrongDataException.class);
     }
@@ -66,7 +66,7 @@ class MonitoringServiceImplTest {
                 .thenReturn(new Indication(LocalDate.now().minusMonths(1), 123L));
 
         verify(monitoringRepository, never()).sendIndication(any(), anyLong());
-        assertThatThrownBy(() -> monitoringServiceImpl.sendIndication(new Indication("ГВ",
+        assertThatThrownBy(() -> monitoringServiceImpl.sendIndication(new Indication(1L, "ГВ",
                 LocalDate.now(), 103L, "name")))
                 .isInstanceOf(WrongDataException.class);
     }
@@ -115,7 +115,7 @@ class MonitoringServiceImplTest {
     @DisplayName(value = "Получение всех показаний пользователя")
     @SneakyThrows
     void getAllIndicationsOfUserTest() {
-        Indication expected = new Indication("ГВ", LocalDate.of(2023, 1, 1), 123L, "name");
+        Indication expected = new Indication(1L, "ГВ", LocalDate.of(2023, 1, 1), 123L, "name");
 
         List<Indication> indications = new ArrayList<>();
         indications.add(expected);
@@ -144,7 +144,7 @@ class MonitoringServiceImplTest {
     @DisplayName(value = "Получение показаний всех пользователей")
     @SneakyThrows
     void getAllIndicationsTest() {
-        Indication expected = new Indication("ГВ", LocalDate.of(2023, 1, 1), 123L, "name");
+        Indication expected = new Indication(1L, "ГВ", LocalDate.of(2023, 1, 1), 123L, "name");
 
         List<Indication> indications = new ArrayList<>();
         indications.add(expected);

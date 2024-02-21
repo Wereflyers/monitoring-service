@@ -44,8 +44,8 @@ class MonitoringRepositoryTest {
     public static void setUp() {
         JDBCConfigTest.doMigration(postgreSQLContainer.getJdbcUrl(),
                 postgreSQLContainer.getUsername(), postgreSQLContainer.getPassword());
-        indication1 = new Indication("ГВ", LocalDate.now(), 123L, "first_user");
-        indication2 = new Indication("ХВ", LocalDate.of(2024, 1, 1),
+        indication1 = new Indication(1L, "ГВ", LocalDate.now(), 123L, "first_user");
+        indication2 = new Indication(1L, "ХВ", LocalDate.of(2024, 1, 1),
                 123L, "second_user");
     }
 

@@ -8,7 +8,8 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public class User extends BaseModel {
+public class User {
+    private Long id;
     /**
      * Name of user
      */

@@ -22,7 +22,7 @@ public interface IndicationMapper {
      * @param indication the indication
      * @return the indication dto
      */
-    IndicationDto indicationToDto(Indication indication);
+    IndicationDto toIndicationDto(Indication indication);
 
     /**
      * Indication dto to indication indication.
@@ -32,7 +32,7 @@ public interface IndicationMapper {
      * @param date          the date
      * @return the indication
      */
-    Indication indicationDtoToIndication(IndicationDto indicationDto, String username, LocalDate date);
+    Indication toIndication(IndicationDto indicationDto, String username, LocalDate date);
 
     /**
      * Indications to list dto indication list dto.
@@ -40,9 +40,9 @@ public interface IndicationMapper {
      * @param indications the indications
      * @return the indication list dto
      */
-    default IndicationListDto indicationsToListDto(List<Indication> indications) {
+    default IndicationListDto toListDto(List<Indication> indications) {
         return new IndicationListDto(indications.stream()
-                .map(this::indicationToDto)
+                .map(this::toIndicationDto)
                 .collect(Collectors.toList()));
     }
 }

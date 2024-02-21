@@ -1,10 +1,11 @@
 package ru.ylab.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.ylab.aop.annotations.Loggable;
 import ru.ylab.domain.model.User;
-import ru.ylab.exceptions.SomeSQLException;
+import ru.ylab.exceptions.DBException;
 import ru.ylab.exceptions.UserAlreadyRegisteredException;
 import ru.ylab.exceptions.WrongDataException;
 import ru.ylab.repository.AuthRepository;
@@ -14,6 +15,7 @@ import java.sql.SQLException;
 
 @Loggable
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
     /**
@@ -29,7 +31,7 @@ public class AuthServiceImpl implements AuthService {
             }
             return authRepository.registerUser(user.getUsername(), user.getPassword());
         } catch (SQLException e) {
-            throw new SomeSQLException("SQLException occurred " + e.getSQLState());
+            throw new DBException("SQLException occurred " + e.getSQLState());
         }
     }
 
@@ -43,10 +45,9 @@ public class AuthServiceImpl implements AuthService {
             if (!user.getPassword().equals(savedUser.getPassword())) {
                 throw new WrongDataException("Введен некорректный пароль");
             }
-            System.out.println("Пользователь " + user.getUsername() + " вошел в сеть.");
+            log.info("Пользователь " + user.getUsername() + " вошел в сеть.");
         } catch (SQLException e) {
-            System.out.println("SQLException occurred " + e.getSQLState());
-            e.printStackTrace();
+            throw new DBException("SQLException occurred " + e.getSQLState());
         }
     }
 
@@ -55,7 +56,7 @@ public class AuthServiceImpl implements AuthService {
         try {
             return authRepository.hasUser(name);
         } catch (SQLException e) {
-            return false;
+            throw new DBException("SQLException occurred " + e.getSQLState());
         }
     }
 }

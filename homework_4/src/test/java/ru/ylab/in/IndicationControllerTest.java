@@ -61,7 +61,7 @@ class IndicationControllerTest {
                         indicationTypeServiceImpl))
                 .setControllerAdvice(new ErrorHandler())
                 .build();
-        indication = new Indication("HB", LocalDate.now(), 123L, "name");
+        indication = new Indication(1L, "HB", LocalDate.now(), 123L, "name");
     }
 
     @Test
@@ -73,7 +73,7 @@ class IndicationControllerTest {
 
         when(authServiceImpl.hasUser(username)).thenReturn(true);
         when(monitoringServiceImpl.sendIndication(any())).thenReturn(
-                indicationMapper.indicationDtoToIndication(indicationDto, username, LocalDate.now()));
+                indicationMapper.toIndication(indicationDto, username, LocalDate.now()));
 
         MvcResult mvcResult = mockMvc.perform(post("/indication")
                         .header("username", username)
@@ -110,7 +110,7 @@ class IndicationControllerTest {
     @SneakyThrows
     @DisplayName(value = "Тест метода для получения всех показаний")
     void getAllIndicationTest() {
-        Indication indication = new Indication("HB", LocalDate.now(), 123L, "name");
+        Indication indication = new Indication(1L, "HB", LocalDate.now(), 123L, "name");
 
         when(monitoringServiceImpl.getAllIndications()).thenReturn(List.of(indication));
 

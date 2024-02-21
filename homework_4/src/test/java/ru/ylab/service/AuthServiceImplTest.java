@@ -35,7 +35,7 @@ class AuthServiceImplTest {
         when(authRepository.hasUser("name")).thenReturn(false);
         when(authRepository.registerUser("name", "pass")).thenReturn("name");
 
-        String actual = authServiceImpl.registerUser(new User("name", "pass"));
+        String actual = authServiceImpl.registerUser(new User(1L, "name", "pass"));
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -47,26 +47,26 @@ class AuthServiceImplTest {
         when(authRepository.hasUser("name")).thenReturn(true);
 
         assertThrows(UserAlreadyRegisteredException.class,
-                () -> authServiceImpl.registerUser(new User("name", "pass")));
+                () -> authServiceImpl.registerUser(new User(1L, "name", "pass")));
     }
 
     @Test
     @DisplayName(value = "Тест авторизации пользователя")
     @SneakyThrows
     void authUserTest() {
-        when(authRepository.getUser("name")).thenReturn(new User("name", "p"));
+        when(authRepository.getUser("name")).thenReturn(new User(1L, "name", "p"));
 
-        assertDoesNotThrow(() -> authServiceImpl.authUser(new User("name", "p")));
+        assertDoesNotThrow(() -> authServiceImpl.authUser(new User(1L, "name", "p")));
     }
 
     @Test
     @DisplayName(value = "Тест авторизации пользователя с неверным паролем")
     @SneakyThrows
     void authUserTest_whenPasswordsNotMatch() {
-        when(authRepository.getUser("name")).thenReturn(new User("name", "p"));
+        when(authRepository.getUser("name")).thenReturn(new User(1L, "name", "p"));
 
         assertThrows(WrongDataException.class,
-                () -> authServiceImpl.authUser(new User("name", "pass")));
+                () -> authServiceImpl.authUser(new User(1L, "name", "pass")));
     }
 
     @Test
@@ -75,7 +75,7 @@ class AuthServiceImplTest {
     void authUserTest_whenNotRegistered() {
         when(authRepository.getUser("name")).thenReturn(null);
 
-        assertThatThrownBy(() -> authServiceImpl.authUser(new User("name", "pass")))
+        assertThatThrownBy(() -> authServiceImpl.authUser(new User(1L, "name", "pass")))
                 .isInstanceOf(WrongDataException.class);
     }
 }

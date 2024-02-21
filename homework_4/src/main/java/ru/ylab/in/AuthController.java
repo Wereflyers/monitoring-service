@@ -42,7 +42,7 @@ public class AuthController {
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> login(@RequestBody UserDto userDto) {
         if (userDto.getUsername() != null && userDto.getPassword() != null) {
-            authService.authUser(userMapper.userDtoToUser(userDto));
+            authService.authUser(userMapper.toUser(userDto));
             String result = "Login successful. Welcome, " + userDto.getUsername();
             return ResponseEntity.ok(result);
         } else {
@@ -58,7 +58,7 @@ public class AuthController {
      */
     @PostMapping(value = "/registration", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> register(@RequestBody @Valid UserDto userDto) {
-        String username = authService.registerUser(userMapper.userDtoToUser(userDto));
+        String username = authService.registerUser(userMapper.toUser(userDto));
         String result = "Registration is successful. Welcome, " + username;
         return ResponseEntity.status(201).body(result);
     }

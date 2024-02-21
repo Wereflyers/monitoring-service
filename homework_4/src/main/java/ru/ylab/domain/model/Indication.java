@@ -15,7 +15,8 @@ import java.time.LocalDate;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ToString
-public class Indication extends BaseModel {
+public class Indication {
+    Long id;
     /**
      * Type of indication
      */
@@ -37,7 +38,7 @@ public class Indication extends BaseModel {
     /**
      * Simplified constructor
      *
-     * @param date indication date
+     * @param date  indication date
      * @param value indication value
      */
     public Indication(LocalDate date, Long value) {

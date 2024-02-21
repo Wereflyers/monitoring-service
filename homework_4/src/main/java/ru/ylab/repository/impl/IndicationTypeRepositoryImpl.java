@@ -1,6 +1,7 @@
 package ru.ylab.repository.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.ylab.config.JDBCConfig;
 import ru.ylab.domain.model.IndicationType;
@@ -15,12 +16,9 @@ import java.util.List;
  */
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class IndicationTypeRepositoryImpl implements IndicationTypeRepository {
     private final JDBCConfig config;
-
-    public IndicationTypeRepositoryImpl() {
-        this.config = new JDBCConfig();
-    }
 
     @Override
     public IndicationType getTypeByName(String typeName) throws SQLException {
@@ -69,9 +67,9 @@ public class IndicationTypeRepositoryImpl implements IndicationTypeRepository {
             statement.setString(1, type.toUpperCase());
             int deletedRows = statement.executeUpdate();
             if (deletedRows > 0) {
-                System.out.println("Deleted All Rows In The Table Successfully...");
+                log.info("Deleted All Rows In The Table Successfully...");
             } else {
-                System.out.println("Table already empty.");
+                log.info("Table already empty.");
             }
         }
     }
