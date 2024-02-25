@@ -9,7 +9,7 @@ import java.lang.annotation.*;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Import({AuditStarterConfig.class})
+@Import({LoggableStarterConfig.class})
 @Documented
 public @interface EnableAuditStarter {
 }
