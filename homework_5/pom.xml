@@ -6,9 +6,13 @@
     <groupId>ru.ylab</groupId>
     <artifactId>monitoring</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>pom</packaging>
 
     <name>monitoring-service</name>
+    <modules>
+        <module>main</module>
+        <module>logging-spring-boot-starter</module>
+    </modules>
 
     <properties>
         <java.version>11</java.version>
