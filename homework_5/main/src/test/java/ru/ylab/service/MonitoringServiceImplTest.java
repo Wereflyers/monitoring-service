@@ -18,8 +18,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -123,10 +124,15 @@ class MonitoringServiceImplTest {
 
         List<Indication> actual = monitoringServiceImpl.getAllIndicationsOfUser("name");
 
-        assertThat(actual.size()).as("Indications amount").isEqualTo(1);
-        assertThat(actual.get(0).getType()).as("Indication type").isEqualTo(expected.getType());
-        assertThat(actual.get(0).getValue()).as("Indication value").isEqualTo(expected.getValue());
-        assertThat(actual.get(0).getUsername()).as("Username").isEqualTo(expected.getUsername());
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual).hasSize(1);
+            softAssertions.assertThat(actual.get(0).getType()).describedAs("Indication type")
+                    .isEqualTo(expected.getType());
+            softAssertions.assertThat(actual.get(0).getValue()).describedAs("Indication value")
+                    .isEqualTo(expected.getValue());
+            softAssertions.assertThat(actual.get(0).getUsername()).describedAs("Username")
+                    .isEqualTo(expected.getUsername());
+        });
     }
 
     @Test
@@ -152,9 +158,14 @@ class MonitoringServiceImplTest {
 
         List<Indication> actual = monitoringServiceImpl.getAllIndications();
 
-        assertThat(actual.size()).as("Indications amount").isEqualTo(1);
-        assertThat(actual.get(0).getType()).as("Indication type").isEqualTo(expected.getType());
-        assertThat(actual.get(0).getValue()).as("Indication value").isEqualTo(expected.getValue());
-        assertThat(actual.get(0).getUsername()).as("Username").isEqualTo(expected.getUsername());
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(actual).hasSize(1);
+            softAssertions.assertThat(actual.get(0).getType()).describedAs("Indication type")
+                    .isEqualTo(expected.getType());
+            softAssertions.assertThat(actual.get(0).getValue()).describedAs("Indication value")
+                    .isEqualTo(expected.getValue());
+            softAssertions.assertThat(actual.get(0).getUsername()).describedAs("Username")
+                    .isEqualTo(expected.getUsername());
+        });
     }
 }

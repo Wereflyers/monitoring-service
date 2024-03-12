@@ -14,14 +14,14 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import ru.ylab.JDBCConfigTest;
-import ru.ylab.config.JDBCConfig;
 import ru.ylab.domain.model.Indication;
 import ru.ylab.repository.impl.MonitoringRepositoryImpl;
 
+import javax.sql.DataSource;
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.mockito.Mockito.when;
 
 @Testcontainers
@@ -30,7 +30,7 @@ class MonitoringRepositoryTest {
     @InjectMocks
     MonitoringRepositoryImpl monitoringRepository;
     @Mock
-    private JDBCConfig config;
+    private DataSource dataSource;
     private static Indication indication1;
     private static Indication indication2;
 
@@ -52,7 +52,7 @@ class MonitoringRepositoryTest {
     @AfterEach
     @SneakyThrows
     public void delete() {
-        when(config.connect()).thenReturn(JDBCConfigTest.connect());
+        when(dataSource.getConnection()).thenReturn(JDBCConfigTest.connect());
         monitoringRepository.deleteAll();
     }
 
@@ -60,16 +60,22 @@ class MonitoringRepositoryTest {
     @SneakyThrows
     @DisplayName("Добавление показания в таблицу")
     public void addIndicationTest() {
-        when(config.connect()).thenReturn(JDBCConfigTest.connect());
+        when(dataSource.getConnection()).thenReturn(JDBCConfigTest.connect());
         monitoringRepository.sendIndication(indication1, 1L);
 
-        when(config.connect()).thenReturn(JDBCConfigTest.connect());
+        when(dataSource.getConnection()).thenReturn(JDBCConfigTest.connect());
         Indication result = monitoringRepository.getLastIndication(1L, "first_user");
 
-        assertThat(result.getUsername()).isEqualTo(indication1.getUsername());
-        assertThat(result.getType()).isEqualTo(indication1.getType());
-        assertThat(result.getValue()).isEqualTo(indication1.getValue());
-        assertThat(result.getDate()).isEqualTo(indication1.getDate());
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(result.getUsername()).describedAs("username")
+                    .isEqualTo(indication1.getUsername());
+            softAssertions.assertThat(result.getType()).describedAs("type")
+                    .isEqualTo(indication1.getType());
+            softAssertions.assertThat(result.getValue()).describedAs("value")
+                    .isEqualTo(indication1.getValue());
+            softAssertions.assertThat(result.getDate()).describedAs("date")
+                    .isEqualTo(indication1.getDate());
+        });
     }
 
     @Test
@@ -78,18 +84,22 @@ class MonitoringRepositoryTest {
     public void checkIndicationForMonthTest() {
         sendTwoIndications();
 
-        when(config.connect()).thenReturn(JDBCConfigTest.connect());
+        when(dataSource.getConnection()).thenReturn(JDBCConfigTest.connect());
         Indication result1 = monitoringRepository.checkIndicationForMonth("first_user", 1L, 2);
 
-        when(config.connect()).thenReturn(JDBCConfigTest.connect());
+        when(dataSource.getConnection()).thenReturn(JDBCConfigTest.connect());
         Indication result2 = monitoringRepository.checkIndicationForMonth("first_user", 1L, 3);
 
-        when(config.connect()).thenReturn(JDBCConfigTest.connect());
+        when(dataSource.getConnection()).thenReturn(JDBCConfigTest.connect());
         Indication result3 = monitoringRepository.checkIndicationForMonth("second_user", 2L, 1);
 
-        assertThat(result1.getValue()).isEqualTo(indication1.getValue());
-        assertThat(result2).isNull();
-        assertThat(result3.getValue()).isEqualTo(indication2.getValue());
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(result1.getValue()).describedAs("first indication value")
+                    .isEqualTo(indication1.getValue());
+            softAssertions.assertThat(result2).describedAs("second indication").isNull();
+            softAssertions.assertThat(result3.getValue()).describedAs("third indication value")
+                    .isEqualTo(indication2.getValue());
+        });
     }
 
     @Test
@@ -98,14 +108,20 @@ class MonitoringRepositoryTest {
     public void getAllIndicationsTest() {
         sendTwoIndications();
 
-        when(config.connect()).thenReturn(JDBCConfigTest.connect());
+        when(dataSource.getConnection()).thenReturn(JDBCConfigTest.connect());
         List<Indication> result = monitoringRepository.getAllIndications();
 
-        assertThat(result.size()).isEqualTo(2);
-        assertThat(result.get(0).getType()).isEqualTo(indication1.getType());
-        assertThat(result.get(0).getValue()).isEqualTo(indication1.getValue());
-        assertThat(result.get(1).getType()).isEqualTo(indication2.getType());
-        assertThat(result.get(1).getValue()).isEqualTo(indication2.getValue());
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(result).hasSize(2);
+            softAssertions.assertThat(result.get(0).getType()).describedAs("first indication type")
+                    .isEqualTo(indication1.getType());
+            softAssertions.assertThat(result.get(0).getValue()).describedAs("first indication value")
+                    .isEqualTo(indication1.getValue());
+            softAssertions.assertThat(result.get(1).getType()).describedAs("second indication type")
+                    .isEqualTo(indication2.getType());
+            softAssertions.assertThat(result.get(1).getValue()).describedAs("second indication value")
+                    .isEqualTo(indication2.getValue());
+        });
     }
 
     @Test
@@ -114,20 +130,25 @@ class MonitoringRepositoryTest {
     public void getAllIndicationsOfUserTest() {
         sendTwoIndications();
 
-        when(config.connect()).thenReturn(JDBCConfigTest.connect());
+        when(dataSource.getConnection()).thenReturn(JDBCConfigTest.connect());
         List<Indication> result = monitoringRepository.getAllIndicationsOfUser("first_user");
 
-        assertThat(result.size()).isEqualTo(1);
-        assertThat(result.get(0).getType()).isEqualTo(indication1.getType());
-        assertThat(result.get(0).getValue()).isEqualTo(indication1.getValue());
-        assertThat(result.get(0).getUsername()).isEqualTo(indication1.getUsername());
+        assertSoftly(softAssertions -> {
+            softAssertions.assertThat(result).hasSize(1);
+            softAssertions.assertThat(result.get(0).getType()).describedAs("type")
+                    .isEqualTo(indication1.getType());
+            softAssertions.assertThat(result.get(0).getValue()).describedAs("value")
+                    .isEqualTo(indication1.getValue());
+            softAssertions.assertThat(result.get(0).getUsername()).describedAs("username")
+                    .isEqualTo(indication1.getUsername());
+        });
     }
 
     @SneakyThrows
     private void sendTwoIndications() {
-        when(config.connect()).thenReturn(JDBCConfigTest.connect());
+        when(dataSource.getConnection()).thenReturn(JDBCConfigTest.connect());
         monitoringRepository.sendIndication(indication1, 1);
-        when(config.connect()).thenReturn(JDBCConfigTest.connect());
+        when(dataSource.getConnection()).thenReturn(JDBCConfigTest.connect());
         monitoringRepository.sendIndication(indication2, 2);
     }
 }

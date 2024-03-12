@@ -2,12 +2,10 @@ package ru.ylab.mapper;
 
 import org.mapstruct.Mapper;
 import ru.ylab.domain.dto.IndicationDto;
-import ru.ylab.domain.dto.IndicationListDto;
 import ru.ylab.domain.model.Indication;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 /**
@@ -35,14 +33,9 @@ public interface IndicationMapper {
     Indication toIndication(IndicationDto indicationDto, String username, LocalDate date);
 
     /**
-     * Indications to list dto indication list dto.
+     * To indication dto list.
      *
-     * @param indications the indications
-     * @return the indication list dto
+     * @return the list
      */
-    default IndicationListDto toListDto(List<Indication> indications) {
-        return new IndicationListDto(indications.stream()
-                .map(this::toIndicationDto)
-                .collect(Collectors.toList()));
-    }
+    List<IndicationDto> toIndicationDtoList(List<Indication> indications);
 }

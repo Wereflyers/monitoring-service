@@ -13,10 +13,10 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import ru.ylab.JDBCConfigTest;
-import ru.ylab.config.JDBCConfig;
 import ru.ylab.domain.model.IndicationType;
 import ru.ylab.repository.impl.IndicationTypeRepositoryImpl;
 
+import javax.sql.DataSource;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,7 +28,7 @@ class IndicationTypeRepositoryTest {
     @InjectMocks
     private IndicationTypeRepositoryImpl indicationTypeRepository;
     @Mock
-    private JDBCConfig config;
+    private DataSource dataSource;
 
     @Container
     public static PostgreSQLContainer<?> postgreSQLContainer =
@@ -47,16 +47,16 @@ class IndicationTypeRepositoryTest {
     public void addTypeTest() {
         String type = "New_type";
 
-        when(config.connect()).thenReturn(JDBCConfigTest.connect());
+        when(dataSource.getConnection()).thenReturn(JDBCConfigTest.connect());
         indicationTypeRepository.addType(type);
-        when(config.connect()).thenReturn(JDBCConfigTest.connect());
+        when(dataSource.getConnection()).thenReturn(JDBCConfigTest.connect());
 
         IndicationType result = indicationTypeRepository.getTypeByName(type);
 
         assertThat(result).isNotNull();
         assertThat(result.getName()).isEqualTo(type.toUpperCase());
 
-        when(config.connect()).thenReturn(JDBCConfigTest.connect());
+        when(dataSource.getConnection()).thenReturn(JDBCConfigTest.connect());
         indicationTypeRepository.delete(type);
     }
 
@@ -65,7 +65,7 @@ class IndicationTypeRepositoryTest {
     @DisplayName("Выгрузка всех типов показаний")
     public void getAllTypes() {
         List<String> types = List.of("ГВ", "ХВ", "ОТОПЛЕНИЕ");
-        when(config.connect()).thenReturn(JDBCConfigTest.connect());
+        when(dataSource.getConnection()).thenReturn(JDBCConfigTest.connect());
 
         List<String> result = indicationTypeRepository.getAllTypes();
 

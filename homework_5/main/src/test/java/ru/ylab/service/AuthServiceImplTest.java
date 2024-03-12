@@ -13,10 +13,7 @@ import ru.ylab.exceptions.WrongDataException;
 import ru.ylab.repository.AuthRepository;
 import ru.ylab.service.impl.AuthServiceImpl;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,8 +43,8 @@ class AuthServiceImplTest {
     void registerUserTest_whenAlreadyRegistered() {
         when(authRepository.hasUser("name")).thenReturn(true);
 
-        assertThrows(UserAlreadyRegisteredException.class,
-                () -> authServiceImpl.registerUser(new User(1L, "name", "pass")));
+        assertThatThrownBy(() -> authServiceImpl.registerUser(new User(1L, "name", "pass")))
+                .isInstanceOf(UserAlreadyRegisteredException.class);
     }
 
     @Test
@@ -56,7 +53,8 @@ class AuthServiceImplTest {
     void authUserTest() {
         when(authRepository.getUser("name")).thenReturn(new User(1L, "name", "p"));
 
-        assertDoesNotThrow(() -> authServiceImpl.authUser(new User(1L, "name", "p")));
+        assertThatCode(() -> authServiceImpl.authUser(new User(1L, "name", "p")))
+                .doesNotThrowAnyException();
     }
 
     @Test
@@ -65,8 +63,8 @@ class AuthServiceImplTest {
     void authUserTest_whenPasswordsNotMatch() {
         when(authRepository.getUser("name")).thenReturn(new User(1L, "name", "p"));
 
-        assertThrows(WrongDataException.class,
-                () -> authServiceImpl.authUser(new User(1L, "name", "pass")));
+        assertThatThrownBy(() -> authServiceImpl.authUser(new User(1L, "name", "pass")))
+                .isInstanceOf(WrongDataException.class);
     }
 
     @Test

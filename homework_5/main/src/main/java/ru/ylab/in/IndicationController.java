@@ -1,13 +1,12 @@
 package ru.ylab.in;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.ylab.aop.annotations.Loggable;
 import ru.ylab.domain.dto.IndicationDto;
-import ru.ylab.domain.dto.IndicationListDto;
 import ru.ylab.domain.model.Indication;
 import ru.ylab.domain.model.IndicationType;
 import ru.ylab.exceptions.NoRightsException;
@@ -16,15 +15,18 @@ import ru.ylab.mapper.IndicationMapper;
 import ru.ylab.service.AuthService;
 import ru.ylab.service.IndicationTypeService;
 import ru.ylab.service.MonitoringService;
+import ru.ylab.starter.aop.annotations.Auditable;
+import ru.ylab.starter.aop.annotations.Loggable;
 
-import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * The type Indication controller.
  */
-@Loggable
 @Validated
+@Loggable
+@Auditable
 @RestController
 @RequestMapping(value = "/indication")
 @RequiredArgsConstructor
@@ -71,12 +73,11 @@ public class IndicationController {
      * @return the all indications
      */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IndicationListDto> getAllIndications(@RequestHeader String username) {
+    public ResponseEntity<List<IndicationDto>> getAllIndications(@RequestHeader String username) {
         if (!username.equals("admin")) {
             throw new NoRightsException("Вы имеете недостаточно прав для выполнения данной операции");
         }
-        return ResponseEntity.ok(indicationMapper.toListDto(
-                monitoringService.getAllIndications()));
+        return ResponseEntity.ok(indicationMapper.toIndicationDtoList(monitoringService.getAllIndications()));
     }
 
     /**
@@ -86,10 +87,10 @@ public class IndicationController {
      * @return the all indications of user
      */
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IndicationListDto> getAllIndicationsOfUser(@RequestHeader String username) {
+    public ResponseEntity<List<IndicationDto>> getAllIndicationsOfUser(@RequestHeader String username) {
         validateUser(username);
 
-        return ResponseEntity.ok(indicationMapper.toListDto(
+        return ResponseEntity.ok(indicationMapper.toIndicationDtoList(
                 monitoringService.getAllIndicationsOfUser(username)));
     }
 

@@ -1,16 +1,16 @@
 package ru.ylab.in;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.ylab.aop.annotations.Loggable;
 import ru.ylab.domain.dto.IndicationTypeDto;
 import ru.ylab.exceptions.NoRightsException;
 import ru.ylab.service.IndicationTypeService;
+import ru.ylab.starter.aop.annotations.Loggable;
 
-import javax.validation.Valid;
 import java.util.List;
 
 /**

@@ -3,10 +3,10 @@ package ru.ylab.repository.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import ru.ylab.config.JDBCConfig;
 import ru.ylab.domain.model.IndicationType;
 import ru.ylab.repository.IndicationTypeRepository;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +18,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class IndicationTypeRepositoryImpl implements IndicationTypeRepository {
-    private final JDBCConfig config;
+    private final DataSource dataSource;
 
     @Override
     public IndicationType getTypeByName(String typeName) throws SQLException {
-        try (Connection connection = config.connect()) {
+        try (Connection getConnection = dataSource.getConnection()) {
             String checkDataSql = "SELECT * FROM indication_type WHERE type_name = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(checkDataSql);
+            PreparedStatement preparedStatement = getConnection.prepareStatement(checkDataSql);
             preparedStatement.setString(1, typeName.toUpperCase());
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -38,9 +38,9 @@ public class IndicationTypeRepositoryImpl implements IndicationTypeRepository {
 
     @Override
     public List<String> getAllTypes() throws SQLException {
-        try (Connection connection = config.connect()) {
+        try (Connection getConnection = dataSource.getConnection()) {
             String checkDataSql = "SELECT * FROM INDICATION_TYPE";
-            Statement statement = connection.createStatement();
+            Statement statement = getConnection.createStatement();
             ResultSet resultSet = statement.executeQuery(checkDataSql);
             List<String> indicationTypeList = new ArrayList<>();
             while (resultSet.next()) {
@@ -52,18 +52,18 @@ public class IndicationTypeRepositoryImpl implements IndicationTypeRepository {
 
     @Override
     public void addType(String type) throws SQLException {
-        try (Connection connection = config.connect()) {
+        try (Connection getConnection = dataSource.getConnection()) {
             String insertDataSql = "INSERT INTO indication_type (TYPE_NAME) VALUES (?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(insertDataSql);
+            PreparedStatement preparedStatement = getConnection.prepareStatement(insertDataSql);
             preparedStatement.setString(1, type.toUpperCase());
             preparedStatement.executeUpdate();
         }
     }
 
     public void delete(String type) throws SQLException {
-        try (Connection connection = config.connect()) {
+        try (Connection getConnection = dataSource.getConnection()) {
             String query = "DELETE FROM indication_type WHERE type_name = ?";
-            PreparedStatement statement = connection.prepareStatement(query);
+            PreparedStatement statement = getConnection.prepareStatement(query);
             statement.setString(1, type.toUpperCase());
             int deletedRows = statement.executeUpdate();
             if (deletedRows > 0) {

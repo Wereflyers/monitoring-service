@@ -3,13 +3,13 @@ package ru.ylab.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.ylab.aop.annotations.Loggable;
 import ru.ylab.domain.model.User;
 import ru.ylab.exceptions.DBException;
 import ru.ylab.exceptions.UserAlreadyRegisteredException;
 import ru.ylab.exceptions.WrongDataException;
 import ru.ylab.repository.AuthRepository;
 import ru.ylab.service.AuthService;
+import ru.ylab.starter.aop.annotations.Loggable;
 
 import java.sql.SQLException;
 

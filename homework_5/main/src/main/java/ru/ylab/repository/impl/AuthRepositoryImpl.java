@@ -3,10 +3,10 @@ package ru.ylab.repository.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import ru.ylab.config.JDBCConfig;
 import ru.ylab.domain.model.User;
 import ru.ylab.repository.AuthRepository;
 
+import javax.sql.DataSource;
 import java.sql.*;
 
 /**
@@ -16,13 +16,13 @@ import java.sql.*;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthRepositoryImpl implements AuthRepository {
-    private final JDBCConfig config;
+    private final DataSource dataSource;
 
     @Override
     public String registerUser(String username, String password) throws SQLException {
-        try (Connection connection = config.connect()) {
+        try (Connection getConnection = dataSource.getConnection()) {
             String insertDataSql = "INSERT INTO users_table (username, password) VALUES (?, ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(insertDataSql);
+            PreparedStatement preparedStatement = getConnection.prepareStatement(insertDataSql);
             preparedStatement.setString(1, username);
             preparedStatement.setString(2, password);
             preparedStatement.executeUpdate();
@@ -32,10 +32,10 @@ public class AuthRepositoryImpl implements AuthRepository {
 
     @Override
     public boolean hasUser(String username) throws SQLException {
-        try (Connection connection = config.connect()) {
+        try (Connection getConnection = dataSource.getConnection()) {
             String checkDataSql = "SELECT " +
                     "EXISTS(SELECT * FROM users_table WHERE username = ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(checkDataSql);
+            PreparedStatement preparedStatement = getConnection.prepareStatement(checkDataSql);
             preparedStatement.setString(1, username);
             ResultSet resultSet = preparedStatement.executeQuery();
             String result = "";
@@ -48,9 +48,9 @@ public class AuthRepositoryImpl implements AuthRepository {
 
     @Override
     public User getUser(String username) throws SQLException {
-        try (Connection connection = config.connect()) {
+        try (Connection getConnection = dataSource.getConnection()) {
             String checkDataSql = "SELECT * FROM users_table WHERE username = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(checkDataSql);
+            PreparedStatement preparedStatement = getConnection.prepareStatement(checkDataSql);
             preparedStatement.setString(1, username);
             ResultSet resultSet = preparedStatement.executeQuery();
             User user = null;
@@ -65,8 +65,8 @@ public class AuthRepositoryImpl implements AuthRepository {
     }
 
     public void deleteAll() throws SQLException {
-        try (Connection connection = config.connect()) {
-            Statement statement = connection.createStatement();
+        try (Connection getConnection = dataSource.getConnection()) {
+            Statement statement = getConnection.createStatement();
             String query = "DELETE FROM users_table";
             int deletedRows = statement.executeUpdate(query);
             if (deletedRows > 0) {

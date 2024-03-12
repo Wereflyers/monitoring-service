@@ -5,24 +5,20 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ru.ylab.config.WebConfig;
+import ru.ylab.config.MainWebAppInitializer;
 import ru.ylab.domain.dto.IndicationDto;
-import ru.ylab.domain.dto.IndicationListDto;
 import ru.ylab.domain.model.Indication;
 import ru.ylab.domain.model.IndicationType;
 import ru.ylab.exceptions.ErrorHandler;
 import ru.ylab.mapper.IndicationMapper;
-import ru.ylab.mapper.IndicationMapperImpl;
 import ru.ylab.service.impl.AuthServiceImpl;
 import ru.ylab.service.impl.IndicationTypeServiceImpl;
 import ru.ylab.service.impl.MonitoringServiceImpl;
@@ -38,8 +34,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringJUnitWebConfig(WebConfig.class)
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest(classes = MainWebAppInitializer.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class IndicationControllerTest {
     private MockMvc mockMvc;
@@ -49,8 +44,10 @@ class IndicationControllerTest {
     private AuthServiceImpl authServiceImpl;
     @Mock
     private IndicationTypeServiceImpl indicationTypeServiceImpl;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private final IndicationMapper indicationMapper = new IndicationMapperImpl();
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private IndicationMapper indicationMapper;
     private Indication indication;
 
     @BeforeEach
@@ -86,8 +83,8 @@ class IndicationControllerTest {
                 mvcResult.getResponse().getContentAsString(),
                 IndicationDto.class);
 
-        assertThat(result.getType()).isEqualTo(indicationDto.getType());
-        assertThat(result.getValue()).isEqualTo(indicationDto.getValue());
+        assertThat(result.getType()).as("indication type").isEqualTo(indicationDto.getType());
+        assertThat(result.getValue()).as("indication value").isEqualTo(indicationDto.getValue());
     }
 
     @Test
@@ -99,9 +96,9 @@ class IndicationControllerTest {
         mockMvc.perform(post("/indication")
                         .header("username", "some_name")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new IndicationDto())))
+                        .content(objectMapper.writeValueAsString(new IndicationDto("name", 123L))))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.status").value(HttpStatus.FORBIDDEN.toString()))
+                .andExpect(jsonPath("$.status").value("FORBIDDEN"))
                 .andExpect(jsonPath("$.message").value(
                         "Вы имеете недостаточно прав для выполнения данной операции"));
     }
@@ -114,18 +111,12 @@ class IndicationControllerTest {
 
         when(monitoringServiceImpl.getAllIndications()).thenReturn(List.of(indication));
 
-        MvcResult mvcResult = mockMvc.perform(get("/indication")
+        mockMvc.perform(get("/indication")
                         .header("username", "admin"))
                 .andExpect(status().isOk())
-                .andReturn();
-
-        IndicationListDto result = objectMapper.readValue(
-                mvcResult.getResponse().getContentAsString(),
-                IndicationListDto.class);
-
-        assertThat(result.getIndications().size()).isEqualTo(1);
-        assertThat(result.getIndications().get(0).getType()).isEqualTo(indication.getType());
-        assertThat(result.getIndications().get(0).getValue()).isEqualTo(indication.getValue());
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].type").value(indication.getType()))
+                .andExpect(jsonPath("$[0].value").value(indication.getValue()));
     }
 
     @Test
@@ -135,7 +126,7 @@ class IndicationControllerTest {
         mockMvc.perform(get("/indication")
                         .header("username", "some_name"))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.status").value(HttpStatus.FORBIDDEN.toString()))
+                .andExpect(jsonPath("$.status").value("FORBIDDEN"))
                 .andExpect(jsonPath("$.message").value(
                         "Вы имеете недостаточно прав для выполнения данной операции"));
     }
@@ -149,18 +140,12 @@ class IndicationControllerTest {
         when(monitoringServiceImpl.getAllIndicationsOfUser(username)).thenReturn(List.of(indication));
         when(authServiceImpl.hasUser(username)).thenReturn(true);
 
-        MvcResult mvcResult = mockMvc.perform(get("/indication/all")
+        mockMvc.perform(get("/indication/all")
                         .header("username", username))
                 .andExpect(status().isOk())
-                .andReturn();
-
-        IndicationListDto result = objectMapper.readValue(
-                mvcResult.getResponse().getContentAsString(),
-                IndicationListDto.class);
-
-        assertThat(result.getIndications().size()).isEqualTo(1);
-        assertThat(result.getIndications().get(0).getType()).isEqualTo(indication.getType());
-        assertThat(result.getIndications().get(0).getValue()).isEqualTo(indication.getValue());
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].type").value(indication.getType()))
+                .andExpect(jsonPath("$[0].value").value(indication.getValue()));
     }
 
     @Test
@@ -172,7 +157,7 @@ class IndicationControllerTest {
         mockMvc.perform(get("/indication/all")
                         .header("username", "some_name"))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.status").value(HttpStatus.FORBIDDEN.toString()))
+                .andExpect(jsonPath("$.status").value("FORBIDDEN"))
                 .andExpect(jsonPath("$.message").value(
                         "Вы имеете недостаточно прав для выполнения данной операции"));
     }
@@ -212,7 +197,7 @@ class IndicationControllerTest {
                         .header("username", "some_name")
                         .param("type", "type"))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.status").value(HttpStatus.FORBIDDEN.toString()))
+                .andExpect(jsonPath("$.status").value("FORBIDDEN"))
                 .andExpect(jsonPath("$.message").value(
                         "Вы имеете недостаточно прав для выполнения данной операции"));
     }
@@ -239,8 +224,8 @@ class IndicationControllerTest {
                 mvcResult.getResponse().getContentAsString(),
                 IndicationDto.class);
 
-        assertThat(result.getType()).isEqualTo(indication.getType());
-        assertThat(result.getValue()).isEqualTo(indication.getValue());
+        assertThat(result.getType()).as("indication type").isEqualTo(indication.getType());
+        assertThat(result.getValue()).as("indication value").isEqualTo(indication.getValue());
     }
 
     @Test
@@ -255,7 +240,7 @@ class IndicationControllerTest {
                         .param("month", "111")
                         .param("type", "type"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.toString()))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
                 .andExpect(jsonPath("$.message").value(
                         "Введите число месяца"));
     }
@@ -272,7 +257,7 @@ class IndicationControllerTest {
                         .param("month", "111")
                         .param("type", "type"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.toString()))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
                 .andExpect(jsonPath("$.message").value(
                         "Некорректный тип показания"));
     }

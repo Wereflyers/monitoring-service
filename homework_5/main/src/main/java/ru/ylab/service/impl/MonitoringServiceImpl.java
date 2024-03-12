@@ -2,7 +2,6 @@ package ru.ylab.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.ylab.aop.annotations.Loggable;
 import ru.ylab.domain.model.Indication;
 import ru.ylab.domain.model.IndicationType;
 import ru.ylab.exceptions.DBException;
@@ -10,6 +9,7 @@ import ru.ylab.exceptions.WrongDataException;
 import ru.ylab.repository.MonitoringRepository;
 import ru.ylab.service.IndicationTypeService;
 import ru.ylab.service.MonitoringService;
+import ru.ylab.starter.aop.annotations.Loggable;
 
 import java.sql.SQLException;
 import java.time.LocalDate;

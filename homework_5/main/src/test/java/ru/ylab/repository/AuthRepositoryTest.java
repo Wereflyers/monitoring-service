@@ -14,9 +14,10 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import ru.ylab.JDBCConfigTest;
-import ru.ylab.config.JDBCConfig;
 import ru.ylab.domain.model.User;
 import ru.ylab.repository.impl.AuthRepositoryImpl;
+
+import javax.sql.DataSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -27,7 +28,7 @@ class AuthRepositoryTest {
     @InjectMocks
     private AuthRepositoryImpl authRepository;
     @Mock
-    private JDBCConfig config;
+    private DataSource dataSource;
 
     @Container
     public static PostgreSQLContainer<?> postgreSQLContainer =
@@ -43,7 +44,7 @@ class AuthRepositoryTest {
     @AfterEach
     @SneakyThrows
     public void delete() {
-        when(config.connect()).thenReturn(JDBCConfigTest.connect());
+        when(dataSource.getConnection()).thenReturn(JDBCConfigTest.connect());
         authRepository.deleteAll();
     }
 
@@ -52,9 +53,9 @@ class AuthRepositoryTest {
     @DisplayName("Добавление пользователя в таблицу")
     public void addUserTest() {
         String username = "nn";
-        when(config.connect()).thenReturn(JDBCConfigTest.connect());
+        when(dataSource.getConnection()).thenReturn(JDBCConfigTest.connect());
         authRepository.registerUser(username, "p");
-        when(config.connect()).thenReturn(JDBCConfigTest.connect());
+        when(dataSource.getConnection()).thenReturn(JDBCConfigTest.connect());
 
         User result = authRepository.getUser(username);
 
@@ -65,12 +66,12 @@ class AuthRepositoryTest {
     @SneakyThrows
     @DisplayName("Определение существования пользователя")
     public void ifExistUserTest() {
-        when(config.connect()).thenReturn(JDBCConfigTest.connect());
+        when(dataSource.getConnection()).thenReturn(JDBCConfigTest.connect());
         boolean res = authRepository.hasUser("n");
-        assertThat(res).isEqualTo(false);
+        assertThat(res).isFalse();
 
-        when(config.connect()).thenReturn(JDBCConfigTest.connect());
+        when(dataSource.getConnection()).thenReturn(JDBCConfigTest.connect());
         boolean res2 = authRepository.hasUser("admin");
-        assertThat(res2).isEqualTo(true);
+        assertThat(res2).isTrue();
     }
 }

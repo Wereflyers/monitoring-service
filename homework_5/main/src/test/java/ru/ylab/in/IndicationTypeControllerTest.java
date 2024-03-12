@@ -5,17 +5,15 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ru.ylab.config.WebConfig;
+import ru.ylab.config.MainWebAppInitializer;
 import ru.ylab.domain.dto.IndicationTypeDto;
 import ru.ylab.exceptions.ErrorHandler;
 import ru.ylab.service.impl.IndicationTypeServiceImpl;
@@ -29,14 +27,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringJUnitWebConfig(WebConfig.class)
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest(classes = MainWebAppInitializer.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class IndicationTypeControllerTest {
     private MockMvc mockMvc;
     @Mock
     private IndicationTypeServiceImpl indicationTypeServiceImpl;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setup() {
@@ -89,7 +87,7 @@ class IndicationTypeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new IndicationTypeDto("Новый тип"))))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.status").value(HttpStatus.FORBIDDEN.toString()))
+                .andExpect(jsonPath("$.status").value("FORBIDDEN"))
                 .andExpect(jsonPath("$.message").value(
                         "Вы имеете недостаточно прав для выполнения данной операции"));
     }

@@ -1,6 +1,7 @@
 package ru.ylab.in;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -8,13 +9,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import ru.ylab.aop.annotations.Loggable;
 import ru.ylab.domain.dto.UserDto;
 import ru.ylab.exceptions.NoRightsException;
 import ru.ylab.mapper.UserMapper;
 import ru.ylab.service.AuthService;
+import ru.ylab.starter.aop.annotations.Loggable;
 
-import javax.validation.Valid;
 
 /**
  * The type Auth controller.

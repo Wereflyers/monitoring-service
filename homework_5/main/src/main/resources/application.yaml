@@ -1,0 +1,16 @@
+logging.level.org.apache.catalina.core: INFO
+logging.level.org.apache.catalina.session: INFO
+spring.datasource.driverClassName: org.postgresql.Driver
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/monitoring?currentSchema=monitoring_schema
+    user: monitor
+    password: monitor
+  liquibase:
+    change-log: classpath:dev/changelog.xml
+    user: monitor
+    password: monitor
+    driver: org.postgresql.Driver
+starter:
+  audit:
+    enabled: false
