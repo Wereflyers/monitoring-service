@@ -2,7 +2,23 @@
 
 Сервис, отвечающий за передачу показаний счетчиков. 
 
-### 1. [ДЗ 1](https://github.com/Wereflyers/monitoring-service/pull/1)
-### 2. [ДЗ 2](https://github.com/Wereflyers/monitoring-service/pull/2)
-### 3. [ДЗ 3](https://github.com/Wereflyers/monitoring-service/pull/3)
-### 4. [ДЗ 4](https://github.com/Wereflyers/monitoring-service/pull/5)
+#### Стэк технологий
+Java
+Maven
+Docker
+Lombok
+JDBC
+Spring Framework
+Swagger
+JUnit, Mockito, Testcontainers
+
+#### Запуск
+Для запуска приложения необходимо:
+
+Запустить mvn clean-package для получения упакованного в war проекта
+Подготовить Docker
+Запустить файл docker-compose.yml и дождаться создания контейнеров
+Запустить Tomcat 10
+Отправлять запросы на эндпоинты локального сервера
+
+Ссылка на Swagger: http://localhost:8080/v2/api-docs
